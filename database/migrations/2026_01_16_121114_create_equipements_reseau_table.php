@@ -10,21 +10,24 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('equipements_reseau', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('equipements_reseau', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreignId('ressource_id')
-              ->constrained('ressources')
-              ->onDelete('cascade');
+            $table->foreignId('ressource_id')
+                  ->constrained('ressources')
+                  ->onDelete('cascade');
 
-        $table->integer('bande_passante'); // Mbps
-        $table->string('emplacement');
-        $table->string('etat');
+            $table->integer('bande_passante'); // Mbps
+            $table->string('emplacement');
+            $table->string('etat');
+            $table->string('type_equipement'); // switch, routeur, pare-feu, etc.
+            $table->string('numero_ports')->nullable();
+            $table->string('modele')->nullable();
 
-        $table->timestamps();
-    });
-}
+            $table->timestamps();
+        });
+    }
 
 
     /**

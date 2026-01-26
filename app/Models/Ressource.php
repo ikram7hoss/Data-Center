@@ -14,6 +14,7 @@ class Ressource extends Model
         'type',
         'status',          // dispo / reserve / maintenance
         'is_active',       // statut général activé / désactivé
+        'manager_id',      // pour mon rôle Responsable 
         'maintenance_start', // date début maintenance
         'maintenance_end',   // date fin maintenance
     ];

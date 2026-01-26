@@ -9,6 +9,8 @@ class MachineVirtuelle extends Model
 {
     use HasFactory;
 
+    protected $table = 'machines_virtuelles';
+
     protected $fillable = [
         'ressource_id',
         'cpu',
@@ -16,11 +18,21 @@ class MachineVirtuelle extends Model
         'stockage',
         'os',
         'bande_passante',
-        'etat',  // dispo / reserve / maintenance
+        'etat',
+        'hyperviseur',
+        'adresse_ip',
     ];
 
+    // Relations
     public function ressource()
     {
         return $this->belongsTo(Ressource::class);
+    }
+
+    // Helper methods
+    public function getUtilizationPercentage()
+    {
+        // Calculate based on allocated resources
+        return 0;
     }
 }

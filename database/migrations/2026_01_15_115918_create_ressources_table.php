@@ -31,9 +31,7 @@ return new class extends Migration
         // statut général (admin seulement)
         $table->boolean('is_active')->default(true);
 
-        // période de maintenance (admin seulement)
-        $table->date('maintenance_start')->nullable();
-        $table->date('maintenance_end')->nullable();
+        $table->foreignId('data_center_id')->nullable()->constrained('data_centers')->onDelete('set null');
 
         $table->timestamps();
     });

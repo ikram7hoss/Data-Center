@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('data_centers', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('location')->nullable();
+            $table->text('description')->nullable();
+            $table->integer('total_capacity_cpu')->default(0);
+            $table->integer('total_capacity_ram')->default(0); // GB
+            $table->integer('total_capacity_storage')->default(0); // GB
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

@@ -10,24 +10,26 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('serveurs', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('serveurs', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreignId('ressource_id')
-              ->constrained('ressources')
-              ->onDelete('cascade');
+            $table->foreignId('ressource_id')
+                  ->constrained('ressources')
+                  ->onDelete('cascade');
 
-        $table->integer('cpu');
-        $table->integer('ram'); // GB
-        $table->integer('stockage'); // GB
-        $table->string('os');
-        $table->string('emplacement');
-        $table->string('etat');
+            $table->integer('cpu');
+            $table->integer('ram'); // GB
+            $table->integer('stockage'); // GB
+            $table->string('os');
+            $table->string('emplacement');
+            $table->string('etat');
+            $table->string('modele')->nullable();
+            $table->string('numero_serie')->nullable();
 
-        $table->timestamps();
-    });
-}
+            $table->timestamps();
+        });
+    }
 
 
     /**

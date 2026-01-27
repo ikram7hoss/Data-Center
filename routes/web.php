@@ -43,3 +43,14 @@ Route::post('/responsable/demande/{id}/{action}', [DataCenterController::class, 
 Route::get('/responsable/demandes', [DataCenterController::class, 'demandes'])->name('responsable.demandes');
 // --- MODÉRATION ---
 Route::delete('/message/{id}', [DataCenterController::class, 'deleteMessage'])->name('messages.delete');
+//nv routes
+use App\Http\Controllers\DemandeCompteController;
+
+// Route pour voir les 4 catalogues serveurs
+Route::get('/espace-invite', function () {
+    return view('espace-invite');
+})->name('espace.invite');
+
+// Routes pour le formulaire de demande de compte
+Route::get('/demande-compte', [DemandeCompteController::class, 'create'])->name('demande.create');
+Route::post('/demande-compte', [DemandeCompteController::class, 'store'])->name('compte.store');

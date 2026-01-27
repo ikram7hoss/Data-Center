@@ -11,10 +11,17 @@ class DemandeCompteController extends Controller
         return view('demande');
     }
 
-    // C'est ici que tu reçois les données pour tes catalogues
     public function store(Request $request)
     {
-        // Cette ligne permet de voir toutes les données envoyées (nom, email, etc.)
-        dd($request->all());
+        // On valide les données reçues
+        $request->validate([
+            'nom_complet' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'role' => 'required'
+        ]);
+
+        // Pour l'instant, on redirige avec un message de succès
+        return redirect()->route('demande.create')->with('success', 'Ta demande a bien été envoyée !');
     }
 }

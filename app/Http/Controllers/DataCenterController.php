@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ressource;
-use App\Models\Demande; 
+use App\Models\Demande;
 use App\Models\Message; // Assure-toi que le modèle Message existe
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 class DataCenterController extends Controller
 {
     public function index()
-    {  
+    {
         $resources = Ressource::where('manager_id', Auth::id())->get();
 
     // On crée une collection de tests pour simuler des demandes réelles
@@ -26,10 +26,10 @@ class DataCenterController extends Controller
             'status' => 'En attente'
         ]
     ]);
-    
+
         // Récupération de tes ressources (manager_id ajouté en SQL)
         $resources = Ressource::with(['serveur', 'machineVirtuelle'])
-                    ->where('manager_id', Auth::id()) 
+                    ->where('manager_id', Auth::id())
                     ->get();
 
         // Récupération des demandes liées à tes ressources
@@ -37,7 +37,7 @@ class DataCenterController extends Controller
                     ->get()
                     ->map(function($demande) {
                         // Statut virtuel pour éviter l'erreur de colonne manquante
-                        $demande->status = 'En attente'; 
+                        $demande->status = 'En attente';
                         return $demande;
                     });
 
@@ -70,11 +70,11 @@ class DataCenterController extends Controller
         return redirect()->back()->with('success', 'Nouvelle ressource ajoutée.');
     }
 
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
         $resource = Ressource::findOrFail($id);
         $resource->update($request->only(['name', 'is_active']));
-        
+
         if ($resource->serveur) {
             $resource->serveur->update($request->only(['cpu', 'ram', 'storage', 'ip_address']));
         }
@@ -82,7 +82,7 @@ class DataCenterController extends Controller
     }
 
     // ATTENTION: Cette fonction plantera tant que la table 'demandes' n'a pas de colonne 'status'
-    public function handleDemande(Request $request, $id, $action) 
+    public function handleDemande(Request $request, $id, $action)
     {
         return redirect()->back()->with('error', 'Action impossible : la colonne status est manquante dans la table demandes.');
     }
@@ -102,4 +102,22 @@ class DataCenterController extends Controller
 
     return view('responsable.demandes', compact('demandes'));
 }
+public function storeCompte(Request $request)
+    {
+        $request->validate([
+            'nom'      => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role'     => 'required'
+        ]);
+
+        \App\Models\User::create([
+            'name'     => $request->nom,
+            'email'    => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role'     => $request->role,
+        ]);
+
+        return redirect()->back()->with('success', 'Votre demande a été envoyée avec succès !');
+    }
 }

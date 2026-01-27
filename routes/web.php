@@ -54,3 +54,4 @@ Route::get('/espace-invite', function () {
 // Routes pour le formulaire de demande de compte
 Route::get('/demande-compte', [DemandeCompteController::class, 'create'])->name('demande.create');
 Route::post('/demande-compte', [DemandeCompteController::class, 'store'])->name('compte.store');
+Route::post('/demande-compte', [App\Http\Controllers\DataCenterController::class, 'storeCompte'])->name('compte.store');

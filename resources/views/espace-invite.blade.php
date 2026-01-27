@@ -32,3 +32,24 @@
         </a>
     </div>
 </div>
+<div style="background: white; border-radius: 10px; padding: 20px; border-top: 5px solid #e74c3c;">
+            <h3 style="color: #c0392b;">SRV-WIN-DATA</h3>
+            <p><strong>Type:</strong> SRV</p>
+            <p><strong>CPU:</strong> 32</p>
+            <p><strong>RAM:</strong> 128 GB</p>
+            <p><strong>OS:</strong> Windows Server 2022</p>
+            <p><strong>Capacité:</strong> 4000</p>
+            <p><strong>Emplacement:</strong> Rack B3</p>
+            <span style="color: #e74c3c; font-weight: bold;">● Indisponible</span>
+        </div>
+
+        <div style="background: white; border-radius: 10px; padding: 20px; border-top: 5px solid #3498db;">
+            <h3 style="color: #2980b9;">SRV-BACKUP-NODE</h3>
+            <p><strong>Type:</strong> SRV</p>
+            <p><strong>CPU:</strong> 16</p>
+            <p><strong>RAM:</strong> 64 GB</p>
+            <p><strong>OS:</strong> Debian 11</p>
+            <p><strong>Capacité:</strong> 5000</p>
+            <p><strong>Emplacement:</strong> Rack C2</p>
+            <span style="color: #27ae60; font-weight: bold;">● Disponible</span>
+        </div>

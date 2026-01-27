@@ -12,12 +12,13 @@ class Ressource extends Model
     protected $fillable = [
         'name',
         'type',
-        'status',
-        'is_active',
+        'status',          // dispo / reserve / maintenance
+        'is_active',       // statut général activé / désactivé
+        'maintenance_start', // date début maintenance
+        'maintenance_end',   // date fin maintenance
         'data_center_id',
     ];
-
-    protected $casts = [
+     protected $casts = [
         'is_active' => 'boolean',
     ];
 

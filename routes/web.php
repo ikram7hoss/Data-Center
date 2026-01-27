@@ -2,24 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DataCenterController;
+use App\Http\Controllers\DemandeCompteController; // On le garde une seule fois ici
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// --- DASHBOARD PRINCIPAL ---
-Route::get('/responsable/dashboard', [DataCenterController::class, 'index'])->name('resp.dashboard');
+// Catalogue des ressources
+Route::get('/espace-invite', [DataCenterController::class, 'catalogue']);
 
-// --- GESTION DES RESSOURCES (Modifier & Mettre à jour) ---
-Route::get('/responsable/resource/{id}/edit', [DataCenterController::class, 'edit'])->name('resource.edit');
-Route::post('/responsable/resource/{id}/update', [DataCenterController::class, 'update'])->name('resource.update');
-// Route pour ajouter une nouvelle ressource
-Route::post('/responsable/resource/store', [DataCenterController::class, 'store'])->name('resource.store');
+// Affichage du formulaire
+Route::get('/demande-compte', [DataCenterController::class, 'creationCompte']);
 
-// --- GESTION DES DEMANDES (Approuver / Refuser) ---
-// On utilise une route dynamique pour l'action (approuver ou refuser)
-Route::post('/responsable/demande/{id}/{action}', [DataCenterController::class, 'handleDemande'])->name('demande.handle');
-// pour afficher uniquement les demandes
-Route::get('/responsable/demandes', [DataCenterController::class, 'demandes'])->name('responsable.demandes');
-// --- MODÉRATION ---
-Route::delete('/message/{id}', [DataCenterController::class, 'deleteMessage'])->name('messages.delete');
+// Envoi du formulaire (On utilise la route 'compte.store' que tu as dans ton HTML)
+Route::post('/envoi-demande', [DemandeCompteController::class, 'store'])->name('compte.store');

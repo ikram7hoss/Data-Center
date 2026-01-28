@@ -36,11 +36,11 @@ class AuthController extends Controller
             // 3. Redirection Utilisateur Interne (Ton travail)
             // On vérifie si l'utilisateur est un utilisateur interne
             if ($user->type === 'utilisateur_interne') {
-                return redirect()->route('internal.dashboard');
+                return redirect()->route('dashboard');
             }
 
             // 4. Par défaut pour les autres (ou si le type n'est pas reconnu)
-            return redirect()->route('espace.invite');
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([
@@ -61,18 +61,20 @@ class AuthController extends Controller
             'password' => 'required|min:5|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect('/login');
+        Auth::login($user);
+
+        return redirect()->route('dashboard');
     }
 
     public function logout()
     {
         Auth::logout();
-        return redirect('/login');
+        return redirect('/');
     }
 }

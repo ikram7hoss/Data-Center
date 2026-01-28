@@ -11,7 +11,9 @@ class Permission extends Model
 
     protected $fillable = [
         'name',
+        'permission_name',
         'description',
+        'user_id',
     ];
 
     // Relations

@@ -3,17 +3,25 @@
 @section('content')
 <h1>Mes incidents</h1>
 
-<ul>
-  @foreach($incidents as $i)
-    <li>
-      <a href="{{ route('internal.incidents.show', $i->id) }}">#{{ $i->id }}</a>
+<div class="incident-list">
+    @forelse($incidents as $i)
+        <a class="incident-card" href="{{ route('internal.incidents.show', $i->id) }}">
+            <div class="incident-header">
+                <div class="incident-title">
+                    <span class="incident-id">#{{ $i->id }}</span>
+                    <span class="incident-name">{{ $i->title }}</span>
+                </div>
+                <span class="incident-date">{{ $i->created_at }}</span>
+            </div>
 
-      | Ressource: {{ $i->ressource->name ?? '—' }}
-      | {{ $i->title }}
-      | Severity: {{ $i->severity }}
-      | Status: {{ $i->status }}
-      | {{ $i->created_at }}
-    </li>
-  @endforeach
-</ul>
+            <div class="incident-meta">
+                <span class="incident-pill">Ressource: {{ $i->ressource->name ?? '—' }}</span>
+                <span class="incident-pill">Severity: {{ $i->severity }}</span>
+                <span class="incident-pill">Status: {{ $i->status }}</span>
+            </div>
+        </a>
+    @empty
+        <div class="incident-empty">Aucun incident trouvé.</div>
+    @endforelse
+</div>
 @endsection

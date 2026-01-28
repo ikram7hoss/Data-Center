@@ -6,12 +6,12 @@
 
     @php
         $roleColors = [
-            'ingénieur' => ['bg' => '#e8f5e9', 'text' => '#2e7d32', 'label' => '🛠️ Ingénieur'],
+            'ingenieur' => ['bg' => '#e8f5e9', 'text' => '#2e7d32', 'label' => '🛠️ Ingénieur'],
             'enseignant' => ['bg' => '#fff3e0', 'text' => '#ef6c00', 'label' => '👨‍🏫 Enseignant'],
             'doctorant' => ['bg' => '#f3e5f5', 'text' => '#7b1fa2', 'label' => '🎓 Doctorant'],
         ];
-        $currentRole = strtolower(auth()->user()->role ?? 'utilisateur');
-        $style = $roleColors[$currentRole] ?? ['bg' => '#f4f7f6', 'text' => '#4a5568', 'label' => $currentRole];
+        $currentRole = auth()->user()->academicRoleKey();
+        $style = $roleColors[$currentRole] ?? ['bg' => '#f4f7f6', 'text' => '#4a5568', 'label' => auth()->user()->academicRoleLabel()];
     @endphp
 
     <p style="font-size: 1.1em; margin-bottom: 30px;">

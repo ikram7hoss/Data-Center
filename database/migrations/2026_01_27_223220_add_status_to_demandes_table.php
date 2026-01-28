@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('demandes', function (Blueprint $table) {
-             $table->enum('status', ['en_attente', 'approuvee', 'refusee', 'active', 'terminee'])
-              ->default('en_attente')
-              ->after('justification');
-        });
+        if (!Schema::hasColumn('demandes', 'status')) {
+            Schema::table('demandes', function (Blueprint $table) {
+                $table->enum('status', ['en_attente', 'approuvee', 'refusee', 'active', 'terminee'])
+                    ->default('en_attente')
+                    ->after('justification');
+            });
+        }
     }
 
     /**
@@ -23,8 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('demandes', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('demandes', 'status')) {
+            Schema::table('demandes', function (Blueprint $table) {
+                $table->dropColumn('status');
+            });
+        }
     }
 };

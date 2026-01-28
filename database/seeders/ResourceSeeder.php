@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use App\Models\Ressource;
 use App\Models\User;
@@ -240,16 +241,30 @@ class ResourceSeeder extends Seeder
             // But looking at migrations, we have separate tables. Let's populate them briefly.
             
             if ($res['type'] == 'serveur') {
-                \App\Models\Serveur::create([
+                $serveurData = [
                     'ressource_id' => $r->id,
                     'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 16,
                     'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 64,
-                    'storage' => 1000, 
                     'os' => 'Linux/Windows',
-                ]);
+                ];
+
+                if (Schema::hasColumn('serveurs', 'storage')) {
+                    $serveurData['storage'] = 1000;
+                } elseif (Schema::hasColumn('serveurs', 'stockage')) {
+                    $serveurData['stockage'] = 1000;
+                }
+
+                if (Schema::hasColumn('serveurs', 'emplacement')) {
+                    $serveurData['emplacement'] = 'Salle A';
+                }
+                if (Schema::hasColumn('serveurs', 'etat')) {
+                    $serveurData['etat'] = 'actif';
+                }
+
+                \App\Models\Serveur::create($serveurData);
             }
              elseif ($res['type'] == 'machine_virtuelle') {
-                \App\Models\MachineVirtuelle::create([
+                $vmData = [
                     'ressource_id' => $r->id,
                     'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 4,
                     'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 16,
@@ -257,8 +272,16 @@ class ResourceSeeder extends Seeder
                     'os' => 'Ubuntu 22.04 LTS',
                     'etat' => 'running',
                     'bande_passante' => 1000,
-                    'adresse_ip' => '10.0.0.'.rand(10, 50)
-                ]);
+                ];
+
+                if (Schema::hasColumn('machines_virtuelles', 'adresse_ip')) {
+                    $vmData['adresse_ip'] = '10.0.0.'.rand(10, 50);
+                }
+                if (Schema::hasColumn('machines_virtuelles', 'ip_address')) {
+                    $vmData['ip_address'] = '10.0.0.'.rand(10, 50);
+                }
+
+                \App\Models\MachineVirtuelle::create($vmData);
             }
         }
     }

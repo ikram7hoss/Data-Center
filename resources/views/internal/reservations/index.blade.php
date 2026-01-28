@@ -39,7 +39,7 @@
 
 
 <ul>
-@foreach($demandes as $d)
+  @foreach($demandes as $d)
     <li>
       <a href="{{ route('internal.reservations.show', $d->id)}}">#{{ $d->id }}</a>
       | Ressource: {{ $d->ressource->name ?? '—' }}
@@ -47,7 +47,9 @@
       | Statut: <span class="status status-{{ $d->status }}">{{ $d->status }}</span>
       
       @if($d->status == 'active')
-        | <a href="{{ route('internal.incidents.create', ['reservation_id' => $d->id]) }}" style="color: orange;">⚠️ Signaler un incident</a>
+        | <a href="{{ route('internal.incidents.create', ['reservation_id' => $d->id]) }}" class="incident-action">⚠️ Signaler un incident</a>
+      @else
+        | <span class="incident-disabled">⚠️ Incident (disponible quand actif)</span>
       @endif
 
       @if(in_array($d->status, ['en_attente', 'refusee']))
@@ -60,5 +62,8 @@
     </li>
   @endforeach
 </ul>
-@endsection
 
+@if($demandes->where('status', 'active')->isEmpty())
+  <div class="incident-hint">Les incidents sont disponibles uniquement pour les demandes actives.</div>
+@endif
+@endsection

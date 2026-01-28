@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmailContract, CanResetPasswordContract
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, MustVerifyEmail, CanResetPassword;
 
     protected $fillable = [
         'name',
@@ -118,6 +122,34 @@ class User extends Authenticatable
     public function isInvite()
     {
         return $this->type === 'invite' || $this->hasRole('invite');
+    }
+
+    public function academicRoleKey(): ?string
+    {
+        $role = $this->roles()->whereIn('name', ['ingenieur', 'enseignant', 'doctorant'])->first();
+        return $role?->name;
+    }
+
+    public function academicRoleLabel(): string
+    {
+        $labels = [
+            'ingenieur' => 'Ingénieur',
+            'enseignant' => 'Enseignant',
+            'doctorant' => 'Doctorant',
+        ];
+
+        $key = $this->academicRoleKey();
+
+        if ($key && isset($labels[$key])) {
+            return $labels[$key];
+        }
+
+        if (!empty($this->role)) {
+            $normalized = strtolower((string) $this->role);
+            return $labels[$normalized] ?? $this->role;
+        }
+
+        return 'Utilisateur interne';
     }
 
     /**

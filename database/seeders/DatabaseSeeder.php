@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        $this->call(RessourceSeeder::class);
+
 
         User::firstOrCreate(
             ['email' => 'test@example.com'],
@@ -58,6 +60,48 @@ class DatabaseSeeder extends Seeder
             // Check if already attached to avoid duplicates? attach() allows dupes in some DBs or throws error?
             // syncWithoutDetaching is safer
             $farah->roles()->syncWithoutDetaching([$roleTech->id]);
+        }
+
+        // Attach academic roles for demo users
+        $roleIngenieur = \App\Models\Role::where('name', 'ingenieur')->first();
+        $roleEnseignant = \App\Models\Role::where('name', 'enseignant')->first();
+        $roleDoctorant = \App\Models\Role::where('name', 'doctorant')->first();
+
+        $ingenieurUser = User::firstOrCreate(
+            ['email' => 'ingenieur@example.com'],
+            [
+                'name' => 'Inès Ingénieur',
+                'type' => 'utilisateur_interne',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        $enseignantUser = User::firstOrCreate(
+            ['email' => 'enseignant@example.com'],
+            [
+                'name' => 'Enzo Enseignant',
+                'type' => 'utilisateur_interne',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        $doctorantUser = User::firstOrCreate(
+            ['email' => 'doctorant@example.com'],
+            [
+                'name' => 'Dounia Doctorant',
+                'type' => 'utilisateur_interne',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        if ($roleIngenieur) {
+            $ingenieurUser->roles()->syncWithoutDetaching([$roleIngenieur->id]);
+        }
+        if ($roleEnseignant) {
+            $enseignantUser->roles()->syncWithoutDetaching([$roleEnseignant->id]);
+        }
+        if ($roleDoctorant) {
+            $doctorantUser->roles()->syncWithoutDetaching([$roleDoctorant->id]);
         }
     }
 }

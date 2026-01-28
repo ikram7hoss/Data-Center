@@ -36,10 +36,10 @@ class Demande extends Model
         'updated_at' => 'datetime',
     ];
 
-    // Relations
+    // --- Relations ---
     public function user()
     {
-       return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function ressource()
@@ -57,7 +57,7 @@ class Demande extends Model
         return $this->hasMany(Notification::class);
     }
 
-    // Scopes
+    // --- Scopes ---
     public function scopeEnAttente($query)
     {
         return $query->where('status', 'en_attente');
@@ -88,7 +88,7 @@ class Demande extends Model
         return $query->where('status', 'conflit');
     }
 
-    // Helper methods
+    // --- Helper methods ---
     public function isPending()
     {
         return $this->status === 'en_attente';

@@ -62,20 +62,29 @@ Route::middleware(['auth'])->prefix('responsable')->group(function () {
     Route::post('/demandes/{id}/refuser', [DataCenterController::class, 'refuser'])->name('demandes.refuser');
 });
 
-// --- Espace Interne (Ton travail) ---
+// --- Espace Interne ---
 Route::middleware(['auth'])->prefix('internal')->name('internal.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    
+    // 1. Route pour la mise à jour du mot de passe
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
     Route::get('/resources', [ResourceController::class, 'index'])->name('resources.index');
     Route::get('/my-reservations', [ReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    
+    // 2. Routes pour les Incidents (Liste + Détails + Création)
     Route::get('/incidents', [IncidentListController::class, 'index'])->name('incidents.index');
     Route::get('/incidents/create/{reservation_id?}', [IncidentController::class, 'create'])->name('incidents.create');
     Route::post('/incidents/store', [IncidentController::class, 'store'])->name('incidents.store');
+    Route::get('/incidents/{id}', [IncidentShowController::class, 'show'])->name('incidents.show'); // <--- Route manquante ajoutée
+
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    
+    // 3. Route pour marquer une notification comme lue
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
-
-
 
 

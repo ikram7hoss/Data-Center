@@ -91,10 +91,4 @@ class User extends Authenticatable
     {
         return $this->type === 'invite' || $this->hasRole('invite');
     }
-    
-    // Un utilisateur peut avoir plusieurs permissions
-    public function permissions()
-    {
-        return $this->hasMany(Permission::class);
-    }
 }

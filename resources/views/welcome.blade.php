@@ -1,9 +1,11 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="container">
+    <div style="margin-bottom: 20px; text-align: center;">
+        <a href="{{ route('demande.create') }}" style="color: red; font-weight: bold; font-size: 20px;">
+            ➜ ACCÉDER AU FORMULAIRE DE DEMANDE
+        </a>
+    </div>
 
+<<<<<<< HEAD
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
@@ -268,10 +270,18 @@
                     <div class="absolute inset-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]"></div>
                 </div>
             </main>
+=======
+    @if (Route::has('login'))
+        <div class="auth-links" style="text-align: right;">
+            @auth
+                <a href="{{ url('/dashboard') }}">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}">Connexion</a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" style="margin-left: 10px;">S'enregistrer</a>
+                @endif
+            @endauth
+>>>>>>> main
         </div>
-
-        @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
-        @endif
-    </body>
-</html>
+    @endif
+</div>

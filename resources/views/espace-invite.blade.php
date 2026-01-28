@@ -103,10 +103,21 @@
                 </div>
             </div>
 
-        </div> <div style="margin-top: 50px; text-align: center;">
-            <a href="{{ route('demande.create') }}" style="display: inline-block; width: 90%; background: #2563eb; color: white; padding: 20px; text-decoration: none; border-radius: 12px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">
-                + Déposer une demande d'ouverture de compte
-            </a>
-        </div>
+  <div style="margin-top: 50px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+
+    <div style="display: flex; gap: 20px; width: 90%; justify-content: center;">
+
+        <a href="{{ route('login') }}" style="flex: 1; max-width: 300px; text-align: center; background: white; color: #2563eb; padding: 18px; text-decoration: none; border-radius: 12px; font-size: 18px; font-weight: bold; border: 2px solid #2563eb; transition: all 0.3s;" onmouseover="this.style.background='#f1f5f9';" onmouseout="this.style.background='white';">
+            Se connecter
+        </a>
+
+        <a href="{{ route('demande.create') }}" style="flex: 1; max-width: 300px; text-align: center; background: #2563eb; color: white; padding: 18px; text-decoration: none; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+            Créer un compte
+        </a>
+
+    </div>
+
+    <p style="color: #64748b; font-size: 14px;">Accédez aux ressources du DataCenter en quelques clics.</p>
+</div>
 
     </div> </div>

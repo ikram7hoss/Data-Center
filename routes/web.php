@@ -55,3 +55,12 @@ Route::get('/espace-invite', function () {
 Route::get('/demande-compte', [DemandeCompteController::class, 'create'])->name('demande.create');
 Route::post('/demande-compte', [DemandeCompteController::class, 'store'])->name('compte.store');
 Route::post('/demande-compte', [App\Http\Controllers\DataCenterController::class, 'storeCompte'])->name('compte.store');
+// Groupe protégé pour l'ADMIN
+Route::middleware(['auth', 'CheckRole:admin'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.dashboard');
+});
+
+// Groupe protégé pour l'INTERNE
+Route::middleware(['auth', 'CheckRole:interne'])->group(function () {
+    Route::get('/responsable/dashboard', [App\Http\Controllers\DataCenterController::class, 'index'])->name('responsable.dashboard');
+});

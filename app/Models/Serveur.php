@@ -15,7 +15,7 @@ class Serveur extends Model
         'ressource_id',
         'cpu',
         'ram',
-        'storage',
+        'stockage',
         'os',
         'ip_address', 
         'network',   

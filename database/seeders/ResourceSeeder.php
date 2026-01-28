@@ -242,14 +242,10 @@ class ResourceSeeder extends Seeder
             if ($res['type'] == 'serveur') {
                 \App\Models\Serveur::create([
                     'ressource_id' => $r->id,
-                    'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 16, // Assuming int column
-                    'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 64,   // Assuming int column
-                    'stockage' => 1000, // Dummy int value as column implies int size
+                    'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 16,
+                    'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 64,
+                    'storage' => 1000, 
                     'os' => 'Linux/Windows',
-                    'emplacement' => $res['name'] == 'Dell PowerEdge R740 - Serveur Principal' ? 'Salle A' : 'Salle B',
-                    'etat' => 'ok',
-                    'modele' => 'Dell R740',
-                    'numero_serie' => 'SN-'.rand(1000,9999)
                 ]);
             }
              elseif ($res['type'] == 'machine_virtuelle') {

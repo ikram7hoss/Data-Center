@@ -88,7 +88,7 @@
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; font-weight: 500;">Stockage</label>
-                        <input type="text" name="storage" placeholder="ex: 2TB SSD" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                        <input type="text" name="stockage" placeholder="ex: 2TB SSD" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
                     </div>
                     <div style="margin-bottom: 15px;">
                         <label style="display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; font-weight: 500;">Système d'exploitation</label>
@@ -171,7 +171,7 @@
                         </div>
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; font-weight: 500;">Stockage</label>
-                            <input type="text" id="edit_storage" name="storage" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+                            <input type="text" id="edit_stockage" name="stockage" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
                         </div>
                         <div style="margin-bottom: 15px;">
                             <label style="display: block; font-size: 13px; color: #64748b; margin-bottom: 5px; font-weight: 500;">Système d'exploitation</label>
@@ -265,7 +265,7 @@
             if (serveur) {
                 setVal('edit_cpu', serveur.cpu);
                 setVal('edit_ram', serveur.ram);
-                setVal('edit_storage', serveur.storage);
+                setVal('edit_stockage', serveur.stockage);
                 setVal('edit_os', serveur.os);
                 setVal('edit_ip_address', serveur.ip_address); // Matches updated ID
                 setVal('edit_network', serveur.network); // Matches new field

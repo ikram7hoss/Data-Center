@@ -35,6 +35,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/resources', [App\Http\Controllers\AdminController::class, 'storeResource'])->name('resources.store');
     Route::post('/resources/{id}/update-details', [App\Http\Controllers\AdminController::class, 'updateResourceDetails'])->name('resources.update-details');
     Route::post('/resources/{id}/maintenance', [App\Http\Controllers\AdminController::class, 'toggleMaintenance'])->name('resources.maintenance');
+    Route::post('/resources/{id}/status', [App\Http\Controllers\AdminController::class, 'updateStatus'])->name('resources.updateStatus');
     Route::delete('/resources/{id}', [App\Http\Controllers\AdminController::class, 'destroyResource'])->name('resources.destroy');
     
     // Maintenance (Placeholder)
@@ -127,7 +128,8 @@ use App\Http\Controllers\DemandeCompteController;
 
 // Route pour voir les 4 catalogues serveurs
 Route::get('/espace-invite', function () {
-    return view('espace-invite');
+    $resources = \App\Models\Ressource::all();
+    return view('espace-invite', compact('resources'));
 })->name('espace.invite');
 
 // Routes pour le formulaire de demande de compte

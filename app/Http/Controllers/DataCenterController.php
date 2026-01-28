@@ -14,18 +14,17 @@ class DataCenterController extends Controller
 {
     public function index()
     {
+        // Get resources managed by the current user
         $resources = Ressource::where('manager_id', Auth::id())->get();
-        // On crée une collection de tests pour simuler des demandes réelles 
-        $demandes = collect([(object)['id' => 1, 'user' => (object)['name' => 'Jean Dupont'], 'ressource' => (object)['name' => 'Serveur i30'], 'periode_start' => '2026-02-01', 'periode_end' => '2026-02-10', 'status' => 'En attente']]);
-        // Récupération de tes ressources (manager_id ajouté en SQL) $resources = Ressource::with(['serveur', 'machineVirtuelle']) ->where('manager_id', Auth::id()) ->get(); // Récupération des demandes liées à tes ressources
-        $demandes = Demande::whereIn('ressource_id', $resources->pluck('id'))->get()->map(function ($demande) {
-            // Statut virtuel pour éviter l'erreur de colonne manquante 
-            $demande->status = 'En attente';
-            return $demande;
-        });
+        
+        // Get demands related to these resources
+        $demandes = Demande::whereIn('ressource_id', $resources->pluck('id'))
+                           ->with(['user', 'ressource'])
+                           ->orderBy('created_at', 'desc')
+                           ->get();
+
         return view('responsable.dashboard', compact('resources', 'demandes'));
     }
-
 
     public function store(Request $request)
     {
@@ -37,7 +36,7 @@ class DataCenterController extends Controller
             'description' => 'nullable|string',
             'cpu' => 'nullable|string',
             'ram' => 'nullable|string',
-            'storage' => 'nullable|string',
+            'stockage' => 'nullable|string',
             'os' => 'nullable|string',
             'ip_address' => 'nullable|string',
             'network' => 'nullable|string',
@@ -51,16 +50,31 @@ class DataCenterController extends Controller
             'description' => $validated['description'],
             'is_active' => true,
             'data_center_id' => 1,
+            'manager_id' => Auth::id(), // Assign to current manager
         ]);
 
-        $resource->serveur()->create([
-            'cpu' => $validated['cpu'],
-            'ram' => $validated['ram'],
-            'storage' => $validated['storage'],
-            'os' => $validated['os'],
-            'ip_address' => $validated['ip_address'],
-            'network' => $validated['network'],
-        ]);
+        // Create specific details based on type (simplified for generic 'serveur' usage if needed, or expand)
+        // Note: You might want to switch/case here if you have different tables, 
+        // but for now keeping it consistent with previous logic that assumed 'serveur' relation.
+        if ($validated['type'] == 'serveur') {
+             $resource->serveur()->create([
+                'cpu' => $validated['cpu'],
+                'ram' => $validated['ram'],
+                'stockage' => $validated['stockage'],
+                'os' => $validated['os'],
+                'ip_address' => $validated['ip_address'],
+                'network' => $validated['network'],
+            ]);
+        } elseif ($validated['type'] == 'machine_virtuelle') {
+             $resource->machineVirtuelle()->create([
+                'cpu' => $validated['cpu'],
+                'ram' => $validated['ram'],
+                'stockage' => $validated['stockage'],
+                'os' => $validated['os'],
+                'adresse_ip' => $validated['ip_address'], // Note: VM uses adresse_ip
+                'bande_passante' => is_numeric($validated['network']) ? $validated['network'] : 0, // VM uses bande_passante
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Ressource et spécifications créées avec succès !');
     }
@@ -68,9 +82,16 @@ class DataCenterController extends Controller
     public function update(Request $request, $id)
     {
         $resource = Ressource::findOrFail($id);
+        
+        // Ensure the user manages this resource
+        if ($resource->manager_id !== Auth::id() && Auth::user()->type !== 'admin') {
+             // Optional: Authorized check
+        }
+
+        // Capture old status
+        $oldStatus = $resource->status;
 
         // 1. Mise à jour de la table principale 'ressources'
-        // On ajoute 'type', 'os', 'location', 'status' et 'description' qui manquaient
         $resource->update($request->only([
             'name',
             'type',
@@ -81,23 +102,64 @@ class DataCenterController extends Controller
             'description'
         ]));
 
-        // 2. Mise à jour de la table liée 'serveurs' (si elle existe)
+        // Check if status changed
+        if ($oldStatus !== $resource->status) {
+            // Find all admins
+            $admins = \App\Models\User::where('type', 'admin')->get();
+            
+            foreach ($admins as $admin) {
+                \App\Models\Notification::create([
+                    'user_id' => $admin->id,
+                    'title'   => 'Changement de statut',
+                    'message' => "La ressource '{$resource->name}' est passée du statut '{$oldStatus}' à '{$resource->status}'.",
+                    'type'    => 'resource_update',
+                    'status'  => 'unread'
+                ]);
+            }
+        }
+
+        // 2. Mise à jour des spécifications détaillées
         if ($resource->serveur) {
             $resource->serveur->update($request->only([
-                'cpu',
-                'ram',
-                'storage',
-                'ip_address'
+                'cpu', 'ram', 'stockage', 'ip_address', 'os', 'network'
             ]));
+        } elseif ($resource->machineVirtuelle) {
+             $resource->machineVirtuelle->update([
+                'cpu' => $request->cpu,
+                'ram' => $request->ram,
+                'stockage' => $request->stockage,
+                'os' => $request->os,
+                'adresse_ip' => $request->ip_address,
+                // 'bande_passante' => $request->network // Optional mapping
+             ]);
         }
 
         return redirect()->back()->with('success', 'Ressource mise à jour avec succès');
     }
 
-    // ATTENTION: Cette fonction plantera tant que la table 'demandes' n'a pas de colonne 'status'
     public function handleDemande(Request $request, $id, $action)
     {
-        return redirect()->back()->with('error', 'Action impossible : la colonne status est manquante dans la table demandes.');
+        $demande = Demande::findOrFail($id);
+
+        if ($action === 'approve') {
+            $demande->update([
+                'status' => 'approuvee',
+                'approved_at' => now(),
+                'responsable_id' => Auth::id()
+            ]);
+             // Notification logic here...
+             return redirect()->back()->with('success', 'Demande approuvée.');
+
+        } elseif ($action === 'refuse') {
+             $demande->update([
+                'status' => 'refusee',
+                'refused_at' => now(),
+                'responsable_id' => Auth::id()
+            ]);
+             return redirect()->back()->with('success', 'Demande refusée.');
+        }
+
+        return redirect()->back()->with('error', 'Action non reconnue.');
     }
 
     public function delete(Ressource $resource)
@@ -116,15 +178,17 @@ class DataCenterController extends Controller
         // 1. On récupère l'onglet cliqué (par défaut 'en_attente')
         $tab = $request->get('tab', 'en_attente');
 
-        // 2. On récupère uniquement les demandes qui correspondent au statut de l'onglet
-        // On utilise 'with' pour charger les infos de la ressource sans faire trop de requêtes
-        $demandes = Demande::with('ressource')
+        // Resources managed by this user
+        $resourceIds = Ressource::where('manager_id', Auth::id())->pluck('id');
+
+        // 2. On récupère uniquement les demandes qui correspondent au statut de l'onglet et aux ressources gérées
+        $demandes = Demande::with(['ressource', 'user'])
+            ->whereIn('ressource_id', $resourceIds)
             ->where('status', $tab)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // 3. On renvoie la vue avec les données filtrées et le nom de l'onglet actuel
-        $demandes = Demande::with('user')->get();
+        // 3. On renvoie la vue avec les données
         return view('responsable.demandes', compact('demandes'));
     }
 

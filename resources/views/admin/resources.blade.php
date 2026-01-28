@@ -110,6 +110,9 @@
                                 </button>
                             </form>
                         @else
+                            <button onclick="openStatusModal('{{ $resource->id }}', '{{ $resource->name }}', '{{ $resource->status }}')" class="btn btn-sm btn-outline" title="Changer Statut" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.3);">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
                             <button onclick="openMaintenanceModal('{{ $resource->id }}', '{{ $resource->name }}')" class="btn btn-sm btn-outline" title="Mettre en Maintenance" style="color: #fbbf24; border-color: rgba(251, 191, 36, 0.3);">
                                 <i class="fas fa-tools"></i>
                             </button>
@@ -132,6 +135,11 @@
                 @endforelse
             </tbody>
         </table>
+        
+        <!-- Resource Count Footer -->
+        <div style="margin-top: 1rem; text-align: left; color: var(--text-secondary); font-size: 0.9rem; padding-left: 0.5rem;">
+            Total ressources : <strong>{{ $resources->count() }}</strong>
+        </div>
     </div>
 
     <!-- Modal Ajouter Ressource -->
@@ -178,6 +186,28 @@
                     <button type="button" onclick="closeAddModal()" class="btn btn-outline" style="color: #94a3b8; border-color: #475569;">Annuler</button>
                     <button type="submit" class="btn btn-primary">Ajouter</button>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="statusModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.2s;">
+        <div class="card" style="width: 100%; max-width: 400px; margin: 2rem;">
+            <div class="flex justify-between items-center mb-3">
+                <h2 id="statusModalTitle">Changer Statut</h2>
+                <button type="button" onclick="closeStatusModal()" style="background:none; border:none; color:var(--text-secondary); font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <form id="statusForm" action="" method="POST">
+                @csrf
+                <div class="mb-3" style="margin-bottom: 1.5rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; color: var(--text-secondary);">Nouveau Statut</label>
+                    <select name="status" id="statusSelect" style="width: 100%; padding: 0.75rem; border-radius: var(--radius-sm); background: var(--bg-app); border: 1px solid var(--border); color: var(--text-primary);">
+                        <option value="disponible">Disponible</option>
+                        <option value="reserve">Réservé</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Valider</button>
             </form>
         </div>
     </div>
@@ -232,6 +262,17 @@
 
         function closeMaintModal() {
             document.getElementById('maintenanceModal').style.display = 'none';
+        }
+
+        function openStatusModal(id, name, currentStatus) {
+            document.getElementById('statusModal').style.display = 'flex';
+            document.getElementById('statusModalTitle').innerText = 'Statut : ' + name;
+            document.getElementById('statusForm').action = '/admin/resources/' + id + '/status';
+            document.getElementById('statusSelect').value = currentStatus;
+        }
+
+        function closeStatusModal() {
+            document.getElementById('statusModal').style.display = 'none';
         }
 
         function submitQuickMaint() {

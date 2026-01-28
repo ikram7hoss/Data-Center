@@ -78,6 +78,36 @@ class User extends Authenticatable
         return $this->roles()->where('name', $roleName)->exists();
     }
 
+
+    public function hasPermission($permissionName)
+    {
+        // 1. Check if explicitly FORBIDDEN (Direct Deny)
+        $isForbidden = $this->permissions()
+                            ->where('name', $permissionName)
+                            ->wherePivot('is_forbidden', true)
+                            ->exists();
+
+        if ($isForbidden) {
+            return false;
+        }
+
+        // 2. Check if explicitly GRANTED (Direct Allow)
+        $isGranted = $this->permissions()
+                          ->where('name', $permissionName)
+                          ->wherePivot('is_forbidden', false)
+                          ->exists();
+
+        if ($isGranted) {
+            return true;
+        }
+
+        // 3. Fallback to Role Permissions
+        return $this->roles()->whereHas('permissions', function($query) use ($permissionName) {
+            $query->where('name', $permissionName);
+        })->exists();
+    }
+
+
     public function isAdmin()
     {
         return $this->type === 'admin' || $this->hasRole('admin');
@@ -97,6 +127,7 @@ class User extends Authenticatable
     {
         return $this->type === 'invite' || $this->hasRole('invite');
     }
+
 
     /* =======================
        Permissions Logic
@@ -129,6 +160,7 @@ class User extends Authenticatable
             $query->where('name', $permissionName);
         })->exists();
     }
+
 
     /**
      * Get the effective permissions for the user

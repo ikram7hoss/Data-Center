@@ -28,6 +28,10 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
             }
 
+            if ($user->type === 'responsable_technique') {
+                return redirect()->route('resp.dashboard');
+            }
+
             // Non-admin users go to catalogue
             return redirect()->route('espace.invite');
         }
@@ -62,6 +66,6 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
-        return redirect('/login');
+        return redirect('/');
     }
 }

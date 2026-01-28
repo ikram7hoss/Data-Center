@@ -29,7 +29,10 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
-    // Relations
+    /* =======================
+       Relations
+    ======================= */
+
     public function demandes()
     {
         return $this->hasMany(Demande::class);
@@ -66,42 +69,13 @@ class User extends Authenticatable
         return $this->hasMany(AuditLog::class);
     }
 
-    // Helper methods
+    /* =======================
+       Helpers Roles
+    ======================= */
+
     public function hasRole($roleName)
     {
         return $this->roles()->where('name', $roleName)->exists();
-    }
-
-    public function hasPermission($permissionName)
-    {
-
-        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
-
-        // 1. Check if explicitly FORBIDDEN (Direct Deny)
-        $isForbidden = $this->permissions()
-                            ->where('name', $permissionName)
-                            ->wherePivot('is_forbidden', true)
-                            ->exists();
-
-        if ($isForbidden) {
-            return false;
-        }
-
-        // 2. Check if explicitly GRANTED (Direct Allow)
-        $isGranted = $this->permissions()
-                          ->where('name', $permissionName)
-                          ->wherePivot('is_forbidden', false)
-                          ->exists();
-
-        if ($isGranted) {
-            return true;
-        }
-
-        // 3. Fallback to Role Permissions
-        return $this->roles()->whereHas('permissions', function($query) use ($permissionName) {
-
-            $query->where('name', $permissionName);
-        })->exists();
     }
 
     public function isAdmin()
@@ -124,43 +98,73 @@ class User extends Authenticatable
         return $this->type === 'invite' || $this->hasRole('invite');
     }
 
+    /* =======================
+       Permissions Logic
+    ======================= */
 
-    // Un utilisateur peut avoir plusieurs permissions
-    public function permissions()
+    public function hasPermission($permissionName)
+    {
+        // 1. Direct FORBIDDEN
+        $isForbidden = $this->permissions()
+            ->where('name', $permissionName)
+            ->wherePivot('is_forbidden', true)
+            ->exists();
+
+        if ($isForbidden) {
+            return false;
+        }
+
+        // 2. Direct GRANTED
+        $isGranted = $this->permissions()
+            ->where('name', $permissionName)
+            ->wherePivot('is_forbidden', false)
+            ->exists();
+
+        if ($isGranted) {
+            return true;
+        }
+
+        // 3. Role Permissions
+        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
+            $query->where('name', $permissionName);
+        })->exists();
+    }
 
     /**
-     * Get the effective permissions for the user (Role + Direct - Forbidden).
+     * Get the effective permissions for the user
+     * (Role permissions + Direct granted - Forbidden)
      */
     public function getEffectivePermissions()
-
     {
-        // 1. Get Role Permissions
+        // 1. Role permissions
         $rolePermissions = $this->roles->flatMap->permissions;
 
-        // 2. Get Direct Permissions
-        $directPermissions = $this->permissions; 
-
-        // 3. Filter Role Permissions
+        // 2. Forbidden permissions
         $forbiddenIds = $this->getForbiddenPermissions()->pluck('id');
+
+        // 3. Active role permissions
         $activeRolePermissions = $rolePermissions->whereNotIn('id', $forbiddenIds);
 
-        // 4. Add Granted Permissions
+        // 4. Granted permissions
         $grantedPermissions = $this->getGrantedPermissions();
-        
-        // 5. Merge and Unique
-        return $activeRolePermissions->merge($grantedPermissions)->unique('id');
+
+        // 5. Merge + unique
+        return $activeRolePermissions
+            ->merge($grantedPermissions)
+            ->unique('id')
+            ->values();
     }
 
     public function getGrantedPermissions()
     {
-        return $this->permissions->filter(function($perm) {
-            return $perm->pivot->is_forbidden == 0; 
+        return $this->permissions->filter(function ($perm) {
+            return $perm->pivot->is_forbidden == 0;
         });
     }
 
     public function getForbiddenPermissions()
     {
-        return $this->permissions->filter(function($perm) {
+        return $this->permissions->filter(function ($perm) {
             return $perm->pivot->is_forbidden == 1;
         });
     }

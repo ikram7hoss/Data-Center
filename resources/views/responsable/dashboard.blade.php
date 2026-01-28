@@ -106,6 +106,9 @@
                         <select name="type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: white; box-sizing: border-box;">
                             <option value="serveur">Serveur Physique</option>
                             <option value="machine_virtuelle">Machine Virtuelle</option>
+                            <option value="serveur">Baies de Stockage</option>
+                            <option value="serveur">Equipements Réseau</option>
+                             
                         </select>
                     </div>
                     <div style="margin-bottom: 15px;">

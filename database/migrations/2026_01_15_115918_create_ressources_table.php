@@ -14,25 +14,22 @@ return new class extends Migration
     Schema::create('ressources', function (Blueprint $table) {
         $table->id();
         $table->string('name');
-
         $table->enum('type', [
             'serveur',
             'machine_virtuelle',
             'equipement_reseau',
             'baie_stockage'
         ]);
-
         $table->enum('status', [
             'disponible',
             'reserve',
             'maintenance'
         ])->default('disponible');
-
-        // statut général (admin seulement)
+        
+        $table->string('location')->nullable(); 
+        $table->text('description')->nullable(); 
         $table->boolean('is_active')->default(true);
-
         $table->foreignId('data_center_id')->nullable()->constrained('data_centers')->onDelete('set null');
-
         $table->timestamps();
     });
 }

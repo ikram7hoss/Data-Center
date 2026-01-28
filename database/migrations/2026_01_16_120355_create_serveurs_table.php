@@ -13,20 +13,13 @@ return new class extends Migration
     {
         Schema::create('serveurs', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('ressource_id')
-                  ->constrained('ressources')
-                  ->onDelete('cascade');
-
-            $table->integer('cpu');
-            $table->integer('ram'); // GB
-            $table->integer('stockage'); // GB
-            $table->string('os');
-            $table->string('emplacement');
-            $table->string('etat');
-            $table->string('modele')->nullable();
-            $table->string('numero_serie')->nullable();
-
+            $table->foreignId('ressource_id')->constrained('ressources')->onDelete('cascade');
+            $table->string('cpu')->nullable();
+            $table->string('ram')->nullable();
+            $table->string('storage')->nullable();
+            $table->string('os')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->string('network')->nullable();
             $table->timestamps();
         });
     }

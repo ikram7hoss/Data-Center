@@ -74,6 +74,9 @@ class User extends Authenticatable
 
     public function hasPermission($permissionName)
     {
+
+        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
+
         // 1. Check if explicitly FORBIDDEN (Direct Deny)
         $isForbidden = $this->permissions()
                             ->where('name', $permissionName)
@@ -96,6 +99,7 @@ class User extends Authenticatable
 
         // 3. Fallback to Role Permissions
         return $this->roles()->whereHas('permissions', function($query) use ($permissionName) {
+
             $query->where('name', $permissionName);
         })->exists();
     }
@@ -120,10 +124,15 @@ class User extends Authenticatable
         return $this->type === 'invite' || $this->hasRole('invite');
     }
 
+
+    // Un utilisateur peut avoir plusieurs permissions
+    public function permissions()
+
     /**
      * Get the effective permissions for the user (Role + Direct - Forbidden).
      */
     public function getEffectivePermissions()
+
     {
         // 1. Get Role Permissions
         $rolePermissions = $this->roles->flatMap->permissions;

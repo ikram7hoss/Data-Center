@@ -278,20 +278,20 @@
                     <label class="label">Nom Complet</label>
                     <input type="text" name="nom_complet" class="form-input" 
                            value="{{ old('nom_complet') }}" 
-                           placeholder="Ex: Alami Jalal" required>
+                           placeholder="Ex: Alami Jalal" required autocomplete="off">
                 </div>
 
                 <div class="form-group">
-                    <label class="label">Email Académique</label>
+                    <label class="label">Adresse Email</label>
                     <input type="email" name="email" class="form-input" 
                            value="{{ old('email') }}" 
-                           placeholder="prenom.nom@um5.ac.ma" required>
+                           placeholder="nom@exemple.com" required autocomplete="off">
                 </div>
 
                 <div class="form-group">
                     <label class="label">Mot de Passe</label>
                     <input type="password" name="password" class="form-input" 
-                           placeholder="••••••••" required>
+                           placeholder="••••••••" required autocomplete="new-password">
                 </div>
 
                 <div class="form-group">

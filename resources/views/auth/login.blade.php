@@ -249,17 +249,17 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" autocomplete="off">
                 @csrf
                 
                 <div class="form-group">
                     <label>Email Professionnel</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="nom@exemple.com">
+                    <input type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="nom@exemple.com" autocomplete="off">
                 </div>
 
                 <div class="form-group">
                     <label>Mot de passe</label>
-                    <input type="password" name="password" required placeholder="••••••••">
+                    <input type="password" name="password" required placeholder="••••••••" autocomplete="new-password">
                 </div>
 
                 <button type="submit">

@@ -10,20 +10,21 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('permissions', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
 
-        $table->foreignId('user_id')
-              ->constrained('users')
-              ->onDelete('cascade');
-
-        $table->string('permission_name');
-        $table->boolean('is_active')->default(true);
-
-        $table->timestamps();
-    });
-}
+        Schema::create('role_permission', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignId('permission_id')->constrained('permissions')->onDelete('cascade');
+            $table->unique(['role_id', 'permission_id']);
+        });
+    }
 
 
     /**

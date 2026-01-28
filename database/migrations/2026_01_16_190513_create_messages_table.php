@@ -9,28 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+
+    
+    public function up()
 {
-    Schema::create('demandes', function (Blueprint $table) {
-        $table->id(); // id demande
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    //Responsable technique de ressources
+    Schema::create('messages', function (Blueprint $table) {
+        $table->id();
         $table->foreignId('ressource_id')->constrained('ressources')->onDelete('cascade');
-
-        $table->date('periode_start')->nullable();
-        $table->date('periode_end')->nullable();
-
-        $table->text('justification')->nullable();
-
+        $table->foreignId('user_id')->constrained('users');
+        $table->text('content');
         $table->timestamps();
     });
 }
-
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('demandes');
+        Schema::dropIfExists('messages');
     }
 };

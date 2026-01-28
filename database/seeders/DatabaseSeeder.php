@@ -22,6 +22,20 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'type' => 'utilisateur_interne',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Admin User',
+            'email' => 'ikram@example.com',
+            'password' => bcrypt('12345'), // Or Hash::make('password') if Hash imported
+            'type' => 'admin',
+            'is_active' => true,
+        ]);
+
+        $this->call([
+            RoleSeeder::class,
+            ResourceSeeder::class,
         ]);
     }
 }

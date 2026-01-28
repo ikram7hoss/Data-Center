@@ -10,21 +10,24 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('baies_stockage', function (Blueprint $table) {
-        $table->id();
+    {
+        Schema::create('baies_stockage', function (Blueprint $table) {
+            $table->id();
 
-        $table->foreignId('ressource_id')
-              ->constrained('ressources')
-              ->onDelete('cascade');
+            $table->foreignId('ressource_id')
+                  ->constrained('ressources')
+                  ->onDelete('cascade');
 
-        $table->integer('capacite'); // GB
-        $table->string('emplacement');
-        $table->string('etat');
+            $table->integer('capacite'); // GB
+            $table->string('emplacement');
+            $table->string('etat');
+            $table->string('type_stockage'); // SSD, HDD, NAS, etc.
+            $table->integer('capacite_utilisee')->default(0); // GB
+            $table->string('systeme_fichiers')->nullable();
 
-        $table->timestamps();
-    });
-}
+            $table->timestamps();
+        });
+    }
 
 
     /**

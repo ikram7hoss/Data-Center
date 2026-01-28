@@ -1,3 +1,9 @@
+/* 
+ * Custom Application Styles
+ * Loading style.css from the layout instead of relying on Vite for CSS processing in this specific setup.
+ * However, we can import style.css here if we want Vite to bundle it.
+ */
+@import 'style.css';
 
 .status{
   padding: 2px 8px;
@@ -27,3 +33,5 @@
 .nav a:hover{
   background:#f2f2f2;
 }
+
+

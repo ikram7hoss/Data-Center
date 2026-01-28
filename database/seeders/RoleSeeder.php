@@ -54,5 +54,18 @@ class RoleSeeder extends Seeder
         // Invité
         $invite = Role::firstOrCreate(['name' => 'invite', 'description' => 'Accès limité']);
         $invite->givePermission('view_resources');
+
+        // New Academic Roles
+        $ingenieur = Role::firstOrCreate(['name' => 'ingenieur', 'description' => 'Ingénieur']);
+        $ingenieur->givePermission('view_resources');
+        $ingenieur->givePermission('create_demande');
+
+        $enseignant = Role::firstOrCreate(['name' => 'enseignant', 'description' => 'Enseignant']);
+        $enseignant->givePermission('view_resources');
+        $enseignant->givePermission('create_demande');
+
+        $doctorant = Role::firstOrCreate(['name' => 'doctorant', 'description' => 'Doctorant']);
+        $doctorant->givePermission('view_resources');
+        $doctorant->givePermission('create_demande');
     }
 }

@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompteDemande extends Model
 {
-    protected $fillable = ['nom_complet', 'email', 'equipe', 'motif'];
+    protected $fillable = ['nom_complet', 'email', 'password', 'role', 'status'];
 }

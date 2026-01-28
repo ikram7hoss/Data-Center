@@ -64,7 +64,7 @@
                         <i class="fas fa-bell" style="font-size: 1.2rem; color: var(--text-secondary);"></i>
                         
                         @if($unreadNotifications->count() > 0)
-                            <span style="position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; border: 2px solid var(--bg-app);"></span>
+                            <span id="notificationBadge" style="position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; border: 2px solid var(--bg-app);"></span>
                         @endif
 
                         <!-- Notification Dropdown -->
@@ -136,8 +136,25 @@
     <script>
         function toggleNotifications() {
             const dropdown = document.getElementById('notificationDropdown');
+            const badge = document.getElementById('notificationBadge');
+
             if (dropdown.style.display === 'none') {
                 dropdown.style.display = 'block';
+                
+                // If badge exists, hide it and mark as read
+                if (badge) {
+                    badge.style.display = 'none'; // Visual feedback immediately
+                    
+                    // Call backend to mark as read
+                    fetch('{{ route("admin.notifications.read") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
             } else {
                 dropdown.style.display = 'none';
             }

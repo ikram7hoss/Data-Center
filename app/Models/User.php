@@ -124,6 +124,7 @@ class User extends Authenticatable
      * Get the effective permissions for the user (Role + Direct - Forbidden).
      */
     public function getEffectivePermissions()
+
     {
         // 1. Get Role Permissions
         $rolePermissions = $this->roles->flatMap->permissions;

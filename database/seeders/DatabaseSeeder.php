@@ -19,23 +19,47 @@ class DatabaseSeeder extends Seeder
         $this->call(RessourceSeeder::class);
 
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'type' => 'utilisateur_interne',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'type' => 'utilisateur_interne',
+                'password' => bcrypt('password'),
+            ]
+        );
 
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'ikram@example.com',
-            'password' => bcrypt('12345'), // Or Hash::make('password') if Hash imported
-            'type' => 'admin',
-            'is_active' => true,
-        ]);
+        User::firstOrCreate(
+            ['email' => 'ikram@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => bcrypt('12345'),
+                'type' => 'admin',
+                'is_active' => true,
+            ]
+        );
+
+        // Create Technical Manager (Farah)
+        $farah = User::firstOrCreate(
+            ['email' => 'farah@example.com'],
+            [
+                'name' => 'Farah',
+                'password' => bcrypt('123456'),
+                'type' => 'responsable_technique',
+                'is_active' => true,
+            ]
+        );
 
         $this->call([
             RoleSeeder::class,
             ResourceSeeder::class,
         ]);
+
+        // Attach Role to Farah after RoleSeeder runs (so the role exists)
+        $roleTech = \App\Models\Role::where('name', 'responsable_technique')->first();
+        if ($roleTech) {
+            // Check if already attached to avoid duplicates? attach() allows dupes in some DBs or throws error?
+            // syncWithoutDetaching is safer
+            $farah->roles()->syncWithoutDetaching([$roleTech->id]);
+        }
     }
 }

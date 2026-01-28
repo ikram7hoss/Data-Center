@@ -16,9 +16,10 @@
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="brand">
-                <i class="fas fa-server"></i> Data Center
-            </div>
+            <a href="{{ url('/') }}" class="brand" style="text-decoration: none; display: flex; align-items: center; gap: 10px; color: inherit;">
+                <img src="{{ asset('images/bg-tech.png') }}" alt="Logo" style="height: 40px; border-radius: 8px;">
+                <span>Data Center</span>
+            </a>
             
             <nav>
                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">

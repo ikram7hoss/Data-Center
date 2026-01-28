@@ -23,12 +23,23 @@ class AuthController extends Controller
             
             $user = Auth::user();
             
-            // Check User Type
+            // 1. Redirection Admin
             if ($user->type === 'admin') {
                 return redirect()->route('admin.dashboard');
             }
 
-            // Non-admin users go to catalogue
+            // 2. Redirection Responsable Technique
+            if ($user->type === 'responsable_technique') {
+                return redirect()->route('resp.dashboard');
+            }
+
+            // 3. Redirection Utilisateur Interne (Ton travail)
+            // On vérifie si l'utilisateur est un utilisateur interne
+            if ($user->type === 'utilisateur_interne') {
+                return redirect()->route('internal.dashboard');
+            }
+
+            // 4. Par défaut pour les autres (ou si le type n'est pas reconnu)
             return redirect()->route('espace.invite');
         }
 
@@ -59,12 +70,9 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-   public function logout(Request $request)
-{
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    return redirect('/login');
-}
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
 }

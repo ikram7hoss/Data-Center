@@ -17,13 +17,16 @@ class AdminController extends Controller
         // Global Statistics
         $totalUsers = User::count();
         $totalResources = Ressource::count();
-        $activeReservations = Demande::where('status', 'active')->count();
-        $pendingDemandes = Demande::where('status', 'en_attente')->count();
+        // Align "Reservations Actives" with resources marked as "reserve"
+        // Align "Reservations Actives" with resources marked as "reserve"
+        $activeReservations = Ressource::where('status', 'reserve')->count();
+        
+        // Sum of Pending Resource Requests AND Pending Account Requests
+        $pendingDemandes = Demande::where('status', 'en_attente')->count() 
+                         + \App\Models\CompteDemande::where('status', 'en_attente')->count();
 
-        // Resource Occupation Stats (Simple mock or real logic)
-        $occupiedResources = Ressource::whereHas('demandes', function($q) {
-            $q->where('status', 'active');
-        })->count();
+        // Resource Occupation Stats (Based on actual Status)
+        $occupiedResources = Ressource::whereIn('status', ['reserve', 'maintenance'])->count();
         
         $usagePercentage = $totalResources > 0 ? round(($occupiedResources / $totalResources) * 100) : 0;
 
@@ -207,6 +210,21 @@ class AdminController extends Controller
         }
 
         return back()->with('success', 'Détails de la ressource mis à jour.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $resource = Ressource::findOrFail($id);
+        
+        $request->validate([
+            'status' => 'required|in:disponible,reserve',
+        ]);
+
+        $resource->update([
+            'status' => $request->status
+        ]);
+
+        return back()->with('success', "Statut de la ressource mis à jour vers '{$request->status}'.");
     }
 
     /**

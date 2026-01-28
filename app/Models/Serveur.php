@@ -17,6 +17,8 @@ class Serveur extends Model
         'ram',
         'stockage',
         'os',
+        'ip_address', 
+        'network',   
         'emplacement',
         'etat',
         'modele',

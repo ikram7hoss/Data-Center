@@ -4,259 +4,257 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Demande d'Ouverture de Compte | DataCenter</title>
-    <!-- Modern Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* Shared variables from style.css for consistency */
         :root {
-            --bg-dark: #0f172a;
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.4);
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #f8fafc;
+            --bg-app: #090a0d;
+            --text-primary: #ffffff;
             --text-secondary: #94a3b8;
-            --radius: 16px;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --border: rgba(255, 255, 255, 0.08); /* Dark mode delicate border */
+            --radius-lg: 30px;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Instrument Sans', sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
 
         body {
-            background-color: var(--bg-dark);
+            /* Fallback */
+            background-color: #0f172a;
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            padding: 20px;
+            overflow-x: hidden;
             position: relative;
         }
 
-        /* Ambient Background Animations */
-        body::before, body::after {
+        /* 
+         * Background Image Implementation 
+         * Using the new user-provided isometric server image with blur.
+         */
+        body::before {
             content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            filter: blur(80px);
+            position: fixed; /* Fixed to cover screen even during scroll (if any) */
+            top: -10px; left: -10px; right: -10px; bottom: -10px; /* Slight bleed to avoid edge blur issues */
+            background-image: url("{{ asset('images/bg-account-request.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            /* The requested blur effect */
+            filter: blur(6px) brightness(0.6); 
             z-index: -1;
-            animation: float 20s infinite ease-in-out;
-        }
-        body::before { top: -200px; left: -200px; animation-delay: 0s; }
-        body::after { bottom: -200px; right: -200px; background: radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%); animation-delay: -10s; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -50px) scale(1.1); }
         }
 
-        .container {
+        .main-container {
             width: 100%;
             max-width: 480px;
-            padding: 20px;
-            perspective: 1000px;
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        
+        /* ... existing styles ... */
 
+        /* Dark Glass Card to match Welcome Page */
         .card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius);
+            background: rgba(18, 20, 26, 0.7); /* Dark translucent */
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             padding: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
             position: relative;
             overflow: hidden;
         }
 
-        /* Top shine effect */
+        /* Top shine gradient */
         .card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         }
 
-        h2 {
-            color: var(--text-primary);
-            font-size: 1.8rem;
+        .brand-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            /* In dark mode, logos might need a small white bg or glow if transparent */
+            /* filter: drop-shadow(0 0 15px rgba(255,255,255,0.1)); */
+        }
+
+        .page-title {
+            font-family: var(--font-heading);
+            font-size: 26px;
             font-weight: 700;
-            text-align: center;
+            color: var(--text-primary);
             margin-bottom: 8px;
-            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
-            text-align: center;
+        .page-subtitle {
+            font-size: 14px;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 30px;
         }
 
+        /* Form */
         .form-group {
             margin-bottom: 20px;
-            position: relative;
-            animation: fadeIn 0.5s ease backwards;
         }
-        .form-group:nth-child(1) { animation-delay: 0.2s; }
-        .form-group:nth-child(2) { animation-delay: 0.3s; }
-        .form-group:nth-child(3) { animation-delay: 0.4s; }
-        .form-group:nth-child(4) { animation-delay: 0.5s; }
 
-        label {
+        .label {
             display: block;
+            font-size: 13px;
+            font-weight: 600;
             color: var(--text-secondary);
-            font-size: 0.85rem;
             margin-bottom: 8px;
-            font-weight: 500;
-            margin-left: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-
-        input, select {
+        /* Dark Inputs */
+        .form-input {
             width: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 14px 16px 14px 44px; /* Space for icon */
+            padding: 14px 16px;
+            font-size: 15px;
             color: var(--text-primary);
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03); /* Subtle dark fill */
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: 0.2s;
         }
 
-        select {
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+        }
+
+        select.form-input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 16px;
-            cursor: pointer;
+        }
+        
+        select.form-input option {
+            background-color: #12141a; /* Dark dropdown bg */
+            color: white;
         }
 
-        select option {
-            background: #1e293b;
-            color: var(--text-primary);
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: rgba(15, 23, 42, 0.8);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        input:focus + i, select:focus + i {
-            color: var(--accent);
-        }
-
+        /* Gradient Button */
         .btn-submit {
             width: 100%;
-            background: linear-gradient(135deg, var(--accent), #2563eb);
-            color: white;
-            border: none;
             padding: 16px;
-            border-radius: 12px;
-            font-size: 1rem;
+            background: var(--accent); /* Fallback */
+            background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+            color: white;
+            font-size: 15px;
             font-weight: 600;
+            border: none;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.6s ease backwards 0.6s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
-            filter: brightness(1.1);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
         }
 
         .back-link {
             display: block;
             text-align: center;
-            margin-top: 25px;
+            margin-top: 24px;
             color: var(--text-secondary);
+            font-size: 14px;
             text-decoration: none;
-            font-size: 0.9rem;
             transition: 0.3s;
-            opacity: 0.8;
-            animation: fadeIn 0.8s ease backwards 0.8s;
         }
 
         .back-link:hover {
             color: var(--text-primary);
-            opacity: 1;
-            transform: translateX(-5px);
-            display: inline-block;
         }
 
-        /* Error & Success Messages */
-        .notification {
+        /* Alerts */
+        .alert {
             padding: 14px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 14px;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            align-items: flex-start;
+            gap: 12px;
         }
-        .notification.error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .notification.success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); height: 0; }
-            to { opacity: 1; transform: translateY(0); height: auto; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="main-container">
+        
         <div class="card">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="{{ asset('images/logo-demande.jpg') }}" alt="Logo" style="width: 80px; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            
+            <div class="brand-header">
+                <img src="{{ asset('images/logo-demande.jpg') }}" alt="Logo" class="brand-logo">
+                <h1 class="page-title">Bienvenue</h1>
+                <p class="page-subtitle">Remplissez le formulaire pour demander votre compte.</p>
             </div>
-            <h2>Créer un Compte</h2>
-            <p class="subtitle">Rejoignez la plateforme académique</p>
 
-            {{-- Error Display --}}
+            {{-- Error Feedback --}}
             @if ($errors->any())
-                <div class="notification error">
-                    <i class="fas fa-exclamation-circle"></i>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle" style="margin-top: 2px;"></i>
                     <div>
                         @foreach ($errors->all() as $error)
                             <div>{{ $error }}</div>
@@ -265,102 +263,181 @@
                 </div>
             @endif
 
-            {{-- Success Display --}}
+            {{-- Success Feedback --}}
             @if(session('success'))
-                <div class="notification success" id="successMsg">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle" style="margin-top: 2px;"></i>
+                    <span>{{ session('success') }}</span>
                 </div>
             @endif
 
-            <form action="{{ route('compte.store') }}" method="POST" autocomplete="off" id="requestForm">
+            <form action="{{ route('compte.store') }}" method="POST" autocomplete="off">
                 @csrf
                 
                 <div class="form-group">
-                    <label>Nom Complet</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-user"></i>
-                        <input type="text" name="nom_complet" value="{{ old('nom_complet') }}" placeholder="Ex: John Doe" required>
-                    </div>
+                    <label class="label">Nom Complet</label>
+                    <input type="text" name="nom_complet" class="form-input" 
+                           value="{{ old('nom_complet') }}" 
+                           placeholder="Ex: Alami Jalal" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Email Académique</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="nom@etude.univ.ma" required>
-                    </div>
+                    <label class="label">Email Académique</label>
+                    <input type="email" name="email" class="form-input" 
+                           value="{{ old('email') }}" 
+                           placeholder="prenom.nom@um5.ac.ma" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Mot de Passe</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" name="password" placeholder="••••••••" required>
-                    </div>
+                    <label class="label">Mot de Passe</label>
+                    <input type="password" name="password" class="form-input" 
+                           placeholder="••••••••" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Profil</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-id-badge"></i>
-                        <select name="role">
-                            <option value="ingenieur">Ingénieur</option>
+                    <label class="label">Profil</label>
+                    <div style="position: relative;">
+                        <select name="role" class="form-input">
                             <option value="enseignant">Enseignant</option>
+                            <option value="ingenieur">Ingénieur</option>
                             <option value="doctorant">Doctorant</option>
                         </select>
                     </div>
                 </div>
 
                 <button type="submit" class="btn-submit">
-                    Envoyer ma Demande <i class="fas fa-paper-plane" style="margin-left: 8px;"></i>
+                    Envoyer ma demande <i class="fas fa-arrow-right"></i>
                 </button>
-            </form>
 
-            <a href="{{ url('/espace-invite') }}" class="back-link">
-                <i class="fas fa-arrow-left" style="margin-right: 5px;"></i> Retour au catalogue
-            </a>
+            </form>
         </div>
+
+        <a href="{{ url('/espace-invite') }}" class="back-link">
+            ← Retour au catalogue
+        </a>
+
     </div>
 
     <script>
-        // Animations & Cleanup
         document.addEventListener('DOMContentLoaded', () => {
-            // Check for success message to clear form
-            @if(session('success'))
-                const form = document.getElementById('requestForm');
-                if(form) form.reset();
-                
-                // Clear all individual inputs just in case browser autofilled
-                document.querySelectorAll('input').forEach(input => input.value = '');
-                document.querySelector('select').selectedIndex = 0;
+            
+            // --- 1. Staggered Entrance Animation ---
+            const elementsToAnimate = [
+                '.brand-logo', 
+                '.page-title', 
+                '.page-subtitle', 
+                '.form-group', 
+                '.btn-submit',
+                '.back-link'
+            ];
 
-                // Auto-hide success message after 5 seconds
-                /*
-                setTimeout(() => {
-                    const msg = document.getElementById('successMsg');
-                    if(msg) {
-                        msg.style.opacity = '0';
-                        msg.style.transform = 'translateY(-10px)';
-                        setTimeout(() => msg.remove(), 500);
-                    }
-                }, 5000);
-                */
-            @endif
+            // Flatten logic to get all elements in order
+            let delay = 100; // ms
+            const allElements = [];
 
-            // Add simple interaction effects
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('focus', () => {
-                   input.parentElement.querySelector('i').style.color = 'var(--accent)';
-                });
-                input.addEventListener('blur', () => {
-                   if(input.value.length === 0) {
-                       input.parentElement.querySelector('i').style.color = 'var(--text-secondary)';
-                   }
-                });
+            elementsToAnimate.forEach(selector => {
+                const els = document.querySelectorAll(selector);
+                els.forEach(el => allElements.push(el));
             });
+
+            // Set initial state via JS to allow graceful degradation if JS fails
+            allElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            });
+
+            // Trigger animations
+            setTimeout(() => {
+                allElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }, 100);
+
+
+            // --- 2. Subtle 3D Tilt Effect on Card ---
+            const card = document.querySelector('.card');
+            const container = document.querySelector('.main-container');
+
+            if (card && container && window.innerWidth > 768) {
+                container.addEventListener('mousemove', (e) => {
+                    const rect = container.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Calculate center
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Angle values (max rotation)
+                    const rotateX = ((y - centerY) / centerY) * -4; // Max -4deg to 4deg
+                    const rotateY = ((x - centerX) / centerX) * 4;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+
+                // Reset on mouse leave
+                container.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                    card.style.transition = 'transform 0.5s ease-out'; // Smooth return
+                });
+
+                container.addEventListener('mouseenter', () => {
+                   card.style.transition = 'transform 0.1s ease-out'; // Quick response on enter
+                });
+            }
+
+            // --- 3. Button Ripple Effect (Optional but "Oion" friendly) ---
+            const btn = document.querySelector('.btn-submit');
+            if(btn) {
+                btn.addEventListener('click', function(e) {
+                    let ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    this.appendChild(ripple);
+                    
+                    let x = e.clientX - e.target.offsetLeft;
+                    let y = e.clientY - e.target.offsetTop;
+                    
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            }
         });
     </script>
+    
+    <style>
+        /* Extra styles for JS effects */
+        .btn-submit {
+            position: relative;
+            overflow: hidden; /* For ripple */
+        }
+        
+        .ripple {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            width: 100px;
+            height: 100px;
+            pointer-events: none;
+            margin-left: -50px;
+            margin-top: -50px;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
 </body>
 </html>

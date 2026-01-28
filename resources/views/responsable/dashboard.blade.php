@@ -189,6 +189,8 @@
                             <select id="edit_type" name="type" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">
                                 <option value="serveur">Serveur Physique</option>
                                 <option value="machine_virtuelle">Machine Virtuelle</option>
+                                <option value="serveur">équipement réseau</option>
+                                <option value="serveur">bloc de stockage</option>
                             </select>
                         </div>
                         <div style="margin-bottom: 15px;">

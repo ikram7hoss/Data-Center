@@ -16,12 +16,12 @@ class DataCenterController extends Controller
     {
         // Get resources managed by the current user
         $resources = Ressource::where('manager_id', Auth::id())->get();
-        
+
         // Get demands related to these resources
         $demandes = Demande::whereIn('ressource_id', $resources->pluck('id'))
-                           ->with(['user', 'ressource'])
-                           ->orderBy('created_at', 'desc')
-                           ->get();
+            ->with(['user', 'ressource'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('responsable.dashboard', compact('resources', 'demandes'));
     }
@@ -57,7 +57,7 @@ class DataCenterController extends Controller
         // Note: You might want to switch/case here if you have different tables, 
         // but for now keeping it consistent with previous logic that assumed 'serveur' relation.
         if ($validated['type'] == 'serveur') {
-             $resource->serveur()->create([
+            $resource->serveur()->create([
                 'cpu' => $validated['cpu'],
                 'ram' => $validated['ram'],
                 'stockage' => $validated['stockage'],
@@ -66,7 +66,7 @@ class DataCenterController extends Controller
                 'network' => $validated['network'],
             ]);
         } elseif ($validated['type'] == 'machine_virtuelle') {
-             $resource->machineVirtuelle()->create([
+            $resource->machineVirtuelle()->create([
                 'cpu' => $validated['cpu'],
                 'ram' => $validated['ram'],
                 'stockage' => $validated['stockage'],
@@ -82,10 +82,10 @@ class DataCenterController extends Controller
     public function update(Request $request, $id)
     {
         $resource = Ressource::findOrFail($id);
-        
+
         // Ensure the user manages this resource
         if ($resource->manager_id !== Auth::id() && Auth::user()->type !== 'admin') {
-             // Optional: Authorized check
+            // Optional: Authorized check
         }
 
         // Capture old status
@@ -106,7 +106,7 @@ class DataCenterController extends Controller
         if ($oldStatus !== $resource->status) {
             // Find all admins
             $admins = \App\Models\User::where('type', 'admin')->get();
-            
+
             foreach ($admins as $admin) {
                 \App\Models\Notification::create([
                     'user_id' => $admin->id,
@@ -117,21 +117,33 @@ class DataCenterController extends Controller
                 ]);
             }
         }
+        
+        $request->validate([
+            'cpu' => 'required',
+            'ram' => 'required',
+            'stockage' => 'required',
+        ]);
+
 
         // 2. Mise à jour des spécifications détaillées
         if ($resource->serveur) {
             $resource->serveur->update($request->only([
-                'cpu', 'ram', 'stockage', 'ip_address', 'os', 'network'
+                'cpu',
+                'ram',
+                'stockage',
+                'ip_address',
+                'os',
+                'network'
             ]));
         } elseif ($resource->machineVirtuelle) {
-             $resource->machineVirtuelle->update([
+            $resource->machineVirtuelle->update([
                 'cpu' => $request->cpu,
                 'ram' => $request->ram,
-                'stockage' => $request->stockage,
+                'storage' => $request->stockage,
                 'os' => $request->os,
                 'adresse_ip' => $request->ip_address,
                 // 'bande_passante' => $request->network // Optional mapping
-             ]);
+            ]);
         }
 
         return redirect()->back()->with('success', 'Ressource mise à jour avec succès');
@@ -147,16 +159,15 @@ class DataCenterController extends Controller
                 'approved_at' => now(),
                 'responsable_id' => Auth::id()
             ]);
-             // Notification logic here...
-             return redirect()->back()->with('success', 'Demande approuvée.');
-
+            // Notification logic here...
+            return redirect()->back()->with('success', 'Demande approuvée.');
         } elseif ($action === 'refuse') {
-             $demande->update([
+            $demande->update([
                 'status' => 'refusee',
                 'refused_at' => now(),
                 'responsable_id' => Auth::id()
             ]);
-             return redirect()->back()->with('success', 'Demande refusée.');
+            return redirect()->back()->with('success', 'Demande refusée.');
         }
 
         return redirect()->back()->with('error', 'Action non reconnue.');

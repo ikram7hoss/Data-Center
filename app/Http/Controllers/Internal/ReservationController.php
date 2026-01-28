@@ -22,16 +22,36 @@ public function show(\App\Models\Demande $demande)
     return view('internal.reservations.show', compact('demande'));
 }
 
-public function index()
+public function index(Request $request)
 {
-   $demandes = Demande::with('ressource')
-    ->where('user_id', 1) // TEMP tant que vous n’avez pas login
-    ->orderBy('id', 'desc')
-    ->get();
+    $query = Demande::where('user_id', Auth::id())->with('ressource');
 
-    return view('internal.reservations.index', compact('demandes'));
+    // Filtre par Statut (ton Blade utilise en_attente, approuvee, etc.)
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
 
+    // Filtre par Ressource
+    if ($request->filled('ressource_id')) {
+        $query->where('ressource_id', $request->ressource_id);
+    }
+
+    // Filtres par Dates (Période)
+    if ($request->filled('from')) {
+        $query->where('periode_start', '>=', $request->from);
+    }
+    if ($request->filled('to')) {
+        $query->where('periode_end', '<=', $request->to);
+    }
+
+    $demandes = $query->orderBy('created_at', 'desc')->get();
+    
+    // Nécessaire pour le menu déroulant du filtre dans la vue
+    $ressources = Ressource::orderBy('name')->get();
+
+    return view('internal.reservations.index', compact('demandes', 'ressources'));
 }
+
 public function store(Request $request)
 {
 
@@ -65,7 +85,18 @@ if ($conflict) {
 
     Demande::create($data);
 
-    return redirect()->route('reservations.index');
+    return redirect()->route('internal.reservations.index');
+}
+public function destroy($id)
+{
+    $demande = Demande::where('user_id', auth()->id())
+        ->whereIn('status', ['en_attente', 'refusee'])
+        ->findOrFail($id);
+
+    $demande->delete();
+
+    return redirect()->route('internal.reservations.index')
+                     ->with('success', 'La demande a été annulée avec succès.');
 }
 }
 

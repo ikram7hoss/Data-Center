@@ -13,7 +13,7 @@
 @endif
 
 
-<form method="POST" action="{{ route('reservations.store') }}">
+<form method="POST" action="{{ route('internal.reservations.store') }}">
   @csrf
 
   <label>Ressource</label>

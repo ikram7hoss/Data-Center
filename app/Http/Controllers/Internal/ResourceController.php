@@ -8,21 +8,28 @@ use App\Models\Ressource;
 
 class ResourceController extends Controller
 {
-public function index(Request $request)
+ public function index(Request $request)
 {
-    $q = Ressource::query();
+    $query = \App\Models\Ressource::query();
 
+    // Filtres
     if ($request->filled('type')) {
-        $q->where('type', $request->type);
+        $query->where('type', $request->type);
     }
-
     if ($request->filled('status')) {
-        $q->where('status', $request->status);
+        $query->where('status', $request->status);
     }
 
-    $ressources = $q->orderBy('id', 'desc')->get();
+    $ressources = $query->get();
+    
+    // Définition des types demandés
+    $types = [
+        'machines_virtuelles' => 'Machines Virtuelles',
+        'baies_stockage' => 'Baies de Stockage',
+        'equipements_reseau' => 'Équipements Réseau'
+    ];
 
-    return view('internal.resources.index', compact('ressources'));
+    return view('internal.resources.index', compact('ressources', 'types'));
 }
 }
 

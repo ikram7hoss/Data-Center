@@ -19,6 +19,8 @@ class Message extends Model
         'ressource_id',
         'user_id',
         'content',
+        'is_notified',
+        'status',
     ];
 
     /**

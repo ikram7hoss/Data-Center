@@ -67,7 +67,7 @@ class User extends Authenticatable
 
     public function hasPermission($permissionName)
     {
-        return $this->roles()->whereHas('permissions', function($query) {
+        return $this->roles()->whereHas('permissions', function ($query) use ($permissionName) {
             $query->where('name', $permissionName);
         })->exists();
     }
@@ -91,7 +91,7 @@ class User extends Authenticatable
     {
         return $this->type === 'invite' || $this->hasRole('invite');
     }
-    
+
     // Un utilisateur peut avoir plusieurs permissions
     public function permissions()
     {

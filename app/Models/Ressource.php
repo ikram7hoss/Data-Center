@@ -14,6 +14,8 @@ class Ressource extends Model
         'type',
         'status',          // dispo / reserve / maintenance
         'is_active',       // statut général activé / désactivé
+        'location',      // Added from form
+        'description',   // Added from form (textarea)
         'maintenance_start', // date début maintenance
         'maintenance_end',   // date fin maintenance
         'data_center_id',

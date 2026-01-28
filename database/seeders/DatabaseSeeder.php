@@ -47,10 +47,10 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // $this->call([
-        //     RoleSeeder::class,
-        //     ResourceSeeder::class,
-        // ]);
+        $this->call([
+            RoleSeeder::class,
+            ResourceSeeder::class,
+        ]);
 
         // Attach Role to Farah after RoleSeeder runs (so the role exists)
         $roleTech = \App\Models\Role::where('name', 'responsable_technique')->first();

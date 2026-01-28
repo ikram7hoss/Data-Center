@@ -19,12 +19,24 @@ class Ressource extends Model
         'maintenance_start', // date début maintenance
         'maintenance_end',   // date fin maintenance
         'data_center_id',
+        'manager_id',
+        'created_by',
     ];
      protected $casts = [
         'is_active' => 'boolean',
     ];
 
     // Relations
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function manager()
+    {
+        return $this->belongsTo(User::class, 'manager_id');
+    }
+
     public function dataCenter()
     {
         return $this->belongsTo(DataCenter::class);

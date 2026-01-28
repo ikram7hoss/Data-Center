@@ -1,0 +1,6 @@
+/* 
+ * Custom Application Styles
+ * Loading style.css from the layout instead of relying on Vite for CSS processing in this specific setup.
+ * However, we can import style.css here if we want Vite to bundle it.
+ */
+@import 'style.css';

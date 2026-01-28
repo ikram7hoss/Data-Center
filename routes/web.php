@@ -35,6 +35,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('/resources', [App\Http\Controllers\AdminController::class, 'storeResource'])->name('resources.store');
     Route::post('/resources/{id}/update-details', [App\Http\Controllers\AdminController::class, 'updateResourceDetails'])->name('resources.update-details');
     Route::post('/resources/{id}/maintenance', [App\Http\Controllers\AdminController::class, 'toggleMaintenance'])->name('resources.maintenance');
+    Route::post('/resources/{id}/status', [App\Http\Controllers\AdminController::class, 'updateStatus'])->name('resources.updateStatus');
     Route::delete('/resources/{id}', [App\Http\Controllers\AdminController::class, 'destroyResource'])->name('resources.destroy');
     
     // Maintenance (Placeholder)

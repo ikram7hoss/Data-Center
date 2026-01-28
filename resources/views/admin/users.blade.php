@@ -61,14 +61,29 @@
                 @foreach($users as $user)
                 <tr>
                     <td>
-                        <div style="font-weight: 600;">{{ $user->name }}</div>
+                        <div style="font-weight: 600; cursor: pointer; color: var(--accent);" onclick="openUserDetails(
+                            '{{ $user->name }}',
+                            '{{ $user->email }}',
+                            '{{ ucfirst($user->roles->pluck('name')->first() ?? $user->type) }}',
+                            '{{ $user->is_active ? 'Actif' : 'Inactif' }}',
+                            '{{ $user->created_at->format('d/m/Y') }}',
+                            '{{ $user->avatar }}'
+                        )">
+                            {{ $user->name }}
+                        </div>
                     </td>
                     <td>{{ $user->email }}</td>
                     <td>
                         <div class="flex items-center gap-1" style="flex-wrap: wrap;">
                             @forelse($user->roles as $role)
+                                @php
+                                    // Logic: Display "Utilisateur Interne" for academic roles in the list
+                                    $displayRole = in_array($role->name, ['ingenieur', 'enseignant', 'doctorant']) 
+                                                    ? 'Utilisateur Interne' 
+                                                    : $role->name;
+                                @endphp
                                 <span class="badge bg-primary" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);">
-                                    {{ $role->name }}
+                                    {{ ucfirst($displayRole) }}
                                 </span>
                             @empty
                                 <span class="badge badge-neutral">{{ $user->type }}</span> <!-- Legacy fallback -->
@@ -192,6 +207,38 @@
         </div>
     </div>
 
+    <!-- Modal User Details -->
+    <div id="userDetailsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; animation: fadeIn 0.2s; padding: 1rem;">
+        <div class="card" style="width: 100%; max-width: 500px; position: relative;">
+            <button type="button" onclick="closeUserDetailsModal()" style="position: absolute; top: 1rem; right: 1rem; background:none; border:none; color:var(--text-secondary); font-size: 1.5rem; cursor:pointer;">&times;</button>
+            
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <img id="modalUserAvatar" src="" alt="Profile" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-app); box-shadow: 0 4px 12px rgba(0,0,0,0.2); margin-bottom: 1rem;">
+                <h2 id="modalUserName" style="font-size: 1.5rem; font-weight: 700;"></h2>
+                <div id="modalUserRole" class="badge bg-primary" style="margin-top: 0.5rem;"></div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-secondary);">Email</span>
+                    <span id="modalUserEmail" style="font-weight: 600;"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-secondary);">Statut</span>
+                    <span id="modalUserStatus" style="font-weight: 600;"></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">
+                    <span style="color: var(--text-secondary);">Membre depuis</span>
+                    <span id="modalUserJoined" style="font-weight: 600;"></span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem; text-align: center;">
+                 <button onclick="closeUserDetailsModal()" class="btn btn-primary" style="width: 100%;">Fermer</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Map of Role ID => [Permission IDs]
         const rolePermissionsMap = @json($rolesWithPermissions);
@@ -277,6 +324,40 @@
                     const cb = document.getElementById('perm_' + permId);
                     if (cb) cb.checked = true;
                 });
+            }
+        }
+
+        /* User Details Modal Logic */
+        function openUserDetails(name, email, role, status, joined, avatarUrl) {
+            document.getElementById('modalUserName').innerText = name;
+            document.getElementById('modalUserEmail').innerText = email;
+            document.getElementById('modalUserRole').innerText = role;
+            document.getElementById('modalUserStatus').innerText = status;
+            document.getElementById('modalUserStatus').style.color = status === 'Actif' ? '#34d399' : '#f87171';
+            document.getElementById('modalUserJoined').innerText = joined;
+            
+            // Avatar
+            const img = document.getElementById('modalUserAvatar');
+            if (avatarUrl && avatarUrl !== 'null' && avatarUrl !== '') {
+                 img.src = '/storage/' + avatarUrl;
+            } else {
+                 img.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(name) + '&background=random&color=fff';
+            }
+
+            document.getElementById('userDetailsModal').style.display = 'flex';
+        }
+
+        function closeUserDetailsModal() {
+            document.getElementById('userDetailsModal').style.display = 'none';
+        }
+
+        // Close on outside click
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('userDetailsModal')) {
+                closeUserDetailsModal();
+            }
+            if (event.target == document.getElementById('roleModal')) {
+                closeRoleModal();
             }
         }
     </script>

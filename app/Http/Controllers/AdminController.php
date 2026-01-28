@@ -394,7 +394,8 @@ class AdminController extends Controller
     public function demandes()
     {
         $demandes = \App\Models\Demande::with(['user', 'ressource'])->latest()->get();
-        return view('admin.demandes', compact('demandes'));
+        $compteDemandes = \App\Models\CompteDemande::where('status', 'en_attente')->latest()->get();
+        return view('admin.demandes', compact('demandes', 'compteDemandes'));
     }
 
     /**
@@ -425,6 +426,74 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Demande refusée.');
+    }
+
+    /**
+     * Approve Account Request
+     */
+    public function approveCompteDemande($id)
+    {
+        $demande = \App\Models\CompteDemande::findOrFail($id);
+        
+        // Check if email already exists
+        if (\App\Models\User::where('email', $demande->email)->exists()) {
+             return back()->with('error', 'Un utilisateur avec cet email existe déjà.');
+        }
+
+        // Map requested role to valid ENUM type and database Role
+        $type = 'utilisateur_interne'; // Default type for most users
+        $roleName = 'utilisateur_interne'; // Default role
+
+        // Special Admin/Responsable logic
+        if ($demande->role === 'responsable') {
+            $type = 'responsable_technique';
+            $roleName = 'responsable_technique';
+        } elseif ($demande->role === 'admin') {
+            $type = 'admin';
+            $roleName = 'admin';
+        } 
+        // Academic Roles (keep type as utilisateur_interne)
+        elseif (in_array($demande->role, ['ingenieur', 'enseignant', 'doctorant'])) {
+            $roleName = $demande->role; // Name matches the passed value
+            $type = 'utilisateur_interne';
+        }
+
+        // Create User
+        $user = \App\Models\User::create([
+            'name' => $demande->nom_complet,
+            'email' => $demande->email,
+            'password' => $demande->password, // Already hashed
+            'type' => $type, 
+            'is_active' => true
+        ]);
+
+        // Assign Role
+        $role = \App\Models\Role::where('name', $roleName)->first();
+        if ($role) {
+            $user->roles()->attach($role->id);
+        } else {
+            // Fallback: Try to find 'utilisateur_interne' if the specific one failed, or log error
+            $defaultRole = \App\Models\Role::where('name', 'utilisateur_interne')->first();
+            if ($defaultRole) {
+                $user->roles()->attach($defaultRole->id);
+            }
+        }
+
+        // Update Request Status
+        $demande->update(['status' => 'approuvee']);
+
+        return back()->with('success', 'Compte créé avec succès.');
+    }
+
+    /**
+     * Refuse Account Request
+     */
+    public function refuseCompteDemande($id)
+    {
+        $demande = \App\Models\CompteDemande::findOrFail($id);
+        $demande->update(['status' => 'refusee']);
+
+        return back()->with('success', 'Demande de compte refusée.');
     }
 
     /**
@@ -514,5 +583,18 @@ class AdminController extends Controller
         $user->save();
 
         return back()->with('success', 'Profil mis à jour avec succès.');
+    }
+
+    /**
+     * Mark all notifications as read.
+     */
+    public function markNotificationsRead()
+    {
+        $user = auth()->user();
+        \App\Models\Notification::where('user_id', $user->id)
+                                ->where('status', 'unread')
+                                ->update(['status' => 'read', 'read_at' => now()]);
+        
+        return response()->json(['success' => true]);
     }
 }

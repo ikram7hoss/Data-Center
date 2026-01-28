@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DataCenterController;
 
 Route::get('/', function () {
-    return view('auth.login');
+    return view('welcome');
 });
 
 Route::get('/dashboard', function () {
@@ -44,13 +44,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/demandes', [App\Http\Controllers\AdminController::class, 'demandes'])->name('demandes');
     Route::post('/demandes/{id}/approve', [App\Http\Controllers\AdminController::class, 'approveDemande'])->name('demandes.approve');
     Route::post('/demandes/{id}/refuse', [App\Http\Controllers\AdminController::class, 'refuseDemande'])->name('demandes.refuse');
+    
+    // Account Requests
+    Route::post('/demandes-compte/{id}/approve', [App\Http\Controllers\AdminController::class, 'approveCompteDemande'])->name('demandes-compte.approve');
+    Route::post('/demandes-compte/{id}/refuse', [App\Http\Controllers\AdminController::class, 'refuseCompteDemande'])->name('demandes-compte.refuse');
 
     // Statistics
     Route::get('/statistics', [App\Http\Controllers\AdminController::class, 'statistics'])->name('statistics');
 
-    // Profile
     Route::get('/profile', [App\Http\Controllers\AdminController::class, 'profile'])->name('profile');
     Route::post('/profile', [App\Http\Controllers\AdminController::class, 'updateProfile'])->name('profile.update');
+
+    // Notifications
+    Route::post('/notifications/read', [App\Http\Controllers\AdminController::class, 'markNotificationsRead'])->name('notifications.read');
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -94,3 +100,5 @@ Route::get('/espace-invite', function () {
 // Routes pour le formulaire de demande de compte
 Route::get('/demande-compte', [DemandeCompteController::class, 'create'])->name('demande.create');
 Route::post('/demande-compte', [DemandeCompteController::class, 'store'])->name('compte.store');
+
+

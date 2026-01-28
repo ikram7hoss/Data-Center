@@ -20,7 +20,16 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+            
+            $user = Auth::user();
+            
+            // Check User Type
+            if ($user->type === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Non-admin users go to catalogue
+            return redirect()->route('espace.invite');
         }
 
         return back()->withErrors([

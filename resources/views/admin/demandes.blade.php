@@ -5,6 +5,56 @@
         <h1 style="font-size: 1.8rem; font-weight: 700;">Gestion des Demandes</h1>
     </div>
 
+    <!-- Account Requests Section -->
+    @if(isset($compteDemandes) && $compteDemandes->count() > 0)
+    <div class="mb-5">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent);">
+            <i class="fas fa-user-plus"></i> Demandes d'Ouverture de Compte
+        </h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nom Complet</th>
+                        <th>Email</th>
+                        <th>Rôle Souhaité</th>
+                        <th>Date Demande</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($compteDemandes as $req)
+                    <tr>
+                        <td class="font-bold">{{ $req->nom_complet }}</td>
+                        <td>{{ $req->email }}</td>
+                        <td><span class="badge bg-primary">{{ $req->role }}</span></td>
+                        <td style="color: var(--text-secondary);">{{ $req->created_at->format('d/m/Y H:i') }}</td>
+                        <td class="flex items-center gap-2" style="justify-content: flex-end;">
+                            <form action="{{ route('admin.demandes-compte.approve', $req->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline" title="Approuver & Créer Compte" style="color: #34d399; border-color: rgba(52, 211, 153, 0.3);">
+                                    <i class="fas fa-check"></i> Créer
+                                </button>
+                            </form>
+                            <form action="{{ route('admin.demandes-compte.refuse', $req->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline" title="Refuser" style="color: #f87171; border-color: rgba(248, 113, 113, 0.3);">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <h2 style="font-size: 1.2rem; margin-bottom: 1rem; color: var(--text-primary);">
+        <i class="fas fa-cubes"></i> Demandes de Ressources
+    </h2>
+
     <div class="table-container">
         <table class="table">
             <thead>

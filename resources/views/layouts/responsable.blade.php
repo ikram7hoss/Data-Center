@@ -128,6 +128,15 @@
                 <i class="fas fa-comments"></i>
                 <span>Modération</span>
             </a>
+
+            {{-- Logout Link --}}
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item" style="color: #ef4444; margin-top: auto; border-top: 1px solid #f0f0f0;">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Déconnexion</span>
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
         </nav>
     </div>
 

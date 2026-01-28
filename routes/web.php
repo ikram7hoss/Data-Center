@@ -127,7 +127,8 @@ use App\Http\Controllers\DemandeCompteController;
 
 // Route pour voir les 4 catalogues serveurs
 Route::get('/espace-invite', function () {
-    return view('espace-invite');
+    $resources = \App\Models\Ressource::all();
+    return view('espace-invite', compact('resources'));
 })->name('espace.invite');
 
 // Routes pour le formulaire de demande de compte

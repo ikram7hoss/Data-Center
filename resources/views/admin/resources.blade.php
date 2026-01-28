@@ -132,6 +132,11 @@
                 @endforelse
             </tbody>
         </table>
+        
+        <!-- Resource Count Footer -->
+        <div style="margin-top: 1rem; text-align: left; color: var(--text-secondary); font-size: 0.9rem; padding-left: 0.5rem;">
+            Total ressources : <strong>{{ $resources->count() }}</strong>
+        </div>
     </div>
 
     <!-- Modal Ajouter Ressource -->

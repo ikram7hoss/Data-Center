@@ -77,7 +77,7 @@ class ResourceSeeder extends Seeder
                 'spec_ram' => 'N/A',
                 'spec_storage' => '30 TB All-Flash',
             ],
-             [
+            [
                 'name' => 'VM-Database-PostgreSQL',
                 'type' => 'machine_virtuelle',
                 'status' => 'disponible',
@@ -238,21 +238,20 @@ class ResourceSeeder extends Seeder
             // Create specific relation details if needed (simplified for now to stick to main table logic if possible or use polymorphic)
             // For this quick fix, we assume Ressource model might have had json columns or we just create basics.
             // But looking at migrations, we have separate tables. Let's populate them briefly.
-            
+
             if ($res['type'] == 'serveur') {
                 \App\Models\Serveur::create([
                     'ressource_id' => $r->id,
-                    'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 16, // Assuming int column
-                    'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 64,   // Assuming int column
-                    'stockage' => 1000, // Dummy int value as column implies int size
+                    'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT))
+                        ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 16,
+                    'ram' => is_numeric(filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT))
+                        ? filter_var($res['spec_ram'], FILTER_SANITIZE_NUMBER_INT) : 64,
+                    'storage' => 1000,            // correspond à ta colonne migration
                     'os' => 'Linux/Windows',
-                    'emplacement' => $res['name'] == 'Dell PowerEdge R740 - Serveur Principal' ? 'Salle A' : 'Salle B',
-                    'etat' => 'ok',
-                    'modele' => 'Dell R740',
-                    'numero_serie' => 'SN-'.rand(1000,9999)
+                    'ip_address' => '192.168.1.' . rand(10, 50),
+                    'network' => 'LAN'
                 ]);
-            }
-             elseif ($res['type'] == 'machine_virtuelle') {
+            } elseif ($res['type'] == 'machine_virtuelle') {
                 \App\Models\MachineVirtuelle::create([
                     'ressource_id' => $r->id,
                     'cpu' => is_numeric(filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT)) ? filter_var($res['spec_cpu'], FILTER_SANITIZE_NUMBER_INT) : 4,
@@ -261,7 +260,7 @@ class ResourceSeeder extends Seeder
                     'os' => 'Ubuntu 22.04 LTS',
                     'etat' => 'running',
                     'bande_passante' => 1000,
-                    'adresse_ip' => '10.0.0.'.rand(10, 50)
+                    'adresse_ip' => '10.0.0.' . rand(10, 50)
                 ]);
             }
         }

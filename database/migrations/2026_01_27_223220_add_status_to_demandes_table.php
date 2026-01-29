@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (!Schema::hasColumn('demandes', 'status')) {
+            Schema::table('demandes', function (Blueprint $table) {
+                $table->enum('status', ['en_attente', 'approuvee', 'refusee', 'active', 'terminee'])
+                    ->default('en_attente')
+                    ->after('justification');
+            });
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (Schema::hasColumn('demandes', 'status')) {
+            Schema::table('demandes', function (Blueprint $table) {
+                $table->dropColumn('status');
+            });
+        }
+    }
+};

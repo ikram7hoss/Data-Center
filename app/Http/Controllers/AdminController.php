@@ -599,9 +599,10 @@ class AdminController extends Controller
         }
 
         $user->save();
-
         return back()->with('success', 'Profil mis à jour avec succès.');
     }
+
+
 
     /**
      * Mark all notifications as read.

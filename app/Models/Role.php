@@ -30,7 +30,7 @@ class Role extends Model
     {
         $permission = Permission::where('name', $permissionName)->first();
         if ($permission) {
-            $this->permissions()->attach($permission->id);
+            $this->permissions()->syncWithoutDetaching([$permission->id]);
         }
     }
 

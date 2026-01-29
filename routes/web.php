@@ -134,31 +134,52 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     
     
-    Route::get('/statistics', [AdminController::class, 'index'])->name('statistics'); 
-    Route::get('/maintenance', [AdminController::class, 'index'])->name('maintenance');
+    Route::get('/maintenance', [AdminController::class, 'maintenance'])->name('maintenance');
+    Route::post('/maintenance', [AdminController::class, 'storeMaintenance'])->name('maintenance.store');
 
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
     Route::post('/notifications/read', [AdminController::class, 'markNotificationsRead'])->name('notifications.read');
 
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/statistics', [AdminController::class, 'statistics'])->name('statistics');
     Route::post('/users/{id}/toggle-status', [AdminController::class, 'toggleUserStatus'])->name('users.toggle-status');
-    Route::post('/users/{id}/update-role', [AdminController::class, 'updateUserRole'])->name('users.role');
+    Route::post('/users/{id}/update-roles', [AdminController::class, 'updateUserRoles'])->name('users.roles');
     
     Route::get('/resources', [AdminController::class, 'resources'])->name('resources');
     Route::post('/resources', [AdminController::class, 'storeResource'])->name('resources.store');
+    Route::post('/resources/{id}/maintenance', [AdminController::class, 'toggleMaintenance'])->name('resources.maintenance');
+    Route::delete('/resources/{id}', [AdminController::class, 'destroyResource'])->name('resources.destroy');
     
     Route::get('/demandes', [AdminController::class, 'demandes'])->name('demandes');
     Route::post('/demandes/{id}/approve', [AdminController::class, 'approveDemande'])->name('demandes.approve');
     Route::post('/demandes/{id}/refuse', [AdminController::class, 'refuseDemande'])->name('demandes.refuse');
+
+    // Demandes de Compte
+    Route::post('/demandes-compte/{id}/approve', [DemandeCompteController::class, 'approve'])->name('demandes-compte.approve');
+    Route::post('/demandes-compte/{id}/refuse', [DemandeCompteController::class, 'refuse'])->name('demandes-compte.refuse');
 });
 
 // --- RESPONSABLE ROUTES ---
 Route::middleware(['auth'])->prefix('responsable')->group(function () {
     Route::get('/dashboard', [DataCenterController::class, 'index'])->name('resp.dashboard');
+    
+    // Resource Management
+    Route::post('/resource/store', [DataCenterController::class, 'store'])->name('resource.store');
+    Route::put('/resource/{id}/update', [DataCenterController::class, 'update'])->name('resource.update');
+    Route::delete('/resource/{resource}', [DataCenterController::class, 'delete'])->name('resource.delete');
+
+    // Demandes Management
     Route::get('/demandes', [DataCenterController::class, 'demandes'])->name('responsable.demandes');
     Route::post('/demandes/{id}/approuver', [DataCenterController::class, 'approuver'])->name('demandes.approuver');
     Route::post('/demandes/{id}/refuser', [DataCenterController::class, 'refuser'])->name('demandes.refuser');
+
+    // Moderation
+    Route::get('/moderation', [DataCenterController::class, 'moderation'])->name('responsable.moderation');
+    Route::post('/moderation/{id}/report', [DataCenterController::class, 'report'])->name('moderation.report');
+    Route::post('/moderation/{id}/approve', [DataCenterController::class, 'approve'])->name('moderation.approve');
+    Route::delete('/moderation/delete/{id}', [DataCenterController::class, 'destroy'])->name('moderation.delete');
+    Route::delete('/moderation/message/{id}', [DataCenterController::class, 'deleteMessage'])->name('messages.delete'); // Fixed generic name
 });
 
 // --- Espace Interne (Ton travail) ---

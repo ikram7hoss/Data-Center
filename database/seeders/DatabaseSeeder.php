@@ -103,5 +103,15 @@ class DatabaseSeeder extends Seeder
         if ($roleDoctorant) {
             $doctorantUser->roles()->syncWithoutDetaching([$roleDoctorant->id]);
         }
+
+        // Create Generic Internal User
+        User::firstOrCreate(
+            ['email' => 'loubna@example.com'],
+            [
+                'name' => 'loubna',
+                'type' => 'utilisateur_interne',
+                'password' => bcrypt('123456'),
+            ]
+        );
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ressource;
-use App\Models\Demande;
+use App\Models\Demande; 
 use App\Models\Message;
 use App\Models\Notification;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class DataCenterController extends Controller
     public function index()
     {
         // Get resources managed by the current user
-        $resources = Ressource::where('manager_id', Auth::id())->get();
+        $resources = Ressource::where('manager_id', Auth::id())->with(['serveur', 'machineVirtuelle'])->get();
         
         // Get demands related to these resources
         $demandes = Demande::whereIn('ressource_id', $resources->pluck('id'))
@@ -31,9 +31,6 @@ class DataCenterController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|string',
-            'status' => 'required|string',
-            'location' => 'nullable|string',
-            'description' => 'nullable|string',
             'cpu' => 'nullable|string',
             'ram' => 'nullable|string',
             'stockage' => 'nullable|string',
@@ -43,36 +40,31 @@ class DataCenterController extends Controller
         ]);
 
         $resource = Ressource::create([
-            'name' => $validated['name'],
-            'type' => $validated['type'],
-            'status' => $validated['status'],
-            'location' => $validated['location'],
-            'description' => $validated['description'],
+            'name' => $request->name,
+            'type' => $request->type,
+            'status' => 'disponible',
             'is_active' => true,
-            'data_center_id' => 1,
             'manager_id' => Auth::id(), // Assign to current manager
         ]);
 
-        // Create specific details based on type (simplified for generic 'serveur' usage if needed, or expand)
-        // Note: You might want to switch/case here if you have different tables, 
-        // but for now keeping it consistent with previous logic that assumed 'serveur' relation.
+        // Create specific details based on type
         if ($validated['type'] == 'serveur') {
              $resource->serveur()->create([
-                'cpu' => $validated['cpu'],
-                'ram' => $validated['ram'],
-                'stockage' => $validated['stockage'],
-                'os' => $validated['os'],
-                'ip_address' => $validated['ip_address'],
-                'network' => $validated['network'],
+                'cpu' => $validated['cpu'] ?? 'N/A',
+                'ram' => $validated['ram'] ?? 'N/A',
+                'stockage' => $validated['stockage'] ?? 'N/A',
+                'os' => $validated['os'] ?? 'N/A',
+                'ip_address' => $validated['ip_address'] ?? '0.0.0.0',
+                'network' => $validated['network'] ?? 'N/A',
             ]);
         } elseif ($validated['type'] == 'machine_virtuelle') {
              $resource->machineVirtuelle()->create([
-                'cpu' => $validated['cpu'],
-                'ram' => $validated['ram'],
-                'stockage' => $validated['stockage'],
-                'os' => $validated['os'],
-                'adresse_ip' => $validated['ip_address'], // Note: VM uses adresse_ip
-                'bande_passante' => is_numeric($validated['network']) ? $validated['network'] : 0, // VM uses bande_passante
+                'cpu' => $validated['cpu'] ?? 'N/A',
+                'ram' => $validated['ram'] ?? 'N/A',
+                'stockage' => $validated['stockage'] ?? 'N/A',
+                'os' => $validated['os'] ?? 'N/A',
+                'adresse_ip' => $validated['ip_address'] ?? '0.0.0.0', 
+                'bande_passante' => is_numeric($validated['network'] ?? 0) ? ($validated['network'] ?? 0) : 0,
             ]);
         }
 
@@ -85,7 +77,7 @@ class DataCenterController extends Controller
         
         // Ensure the user manages this resource
         if ($resource->manager_id !== Auth::id() && Auth::user()->type !== 'admin') {
-             // Optional: Authorized check
+             // Optional: Authorized check logic could go here
         }
 
         // Capture old status
@@ -108,7 +100,7 @@ class DataCenterController extends Controller
             $admins = \App\Models\User::where('type', 'admin')->get();
             
             foreach ($admins as $admin) {
-                \App\Models\Notification::create([
+                Notification::create([
                     'user_id' => $admin->id,
                     'title'   => 'Changement de statut',
                     'message' => "La ressource '{$resource->name}' est passée du statut '{$oldStatus}' à '{$resource->status}'.",
@@ -134,10 +126,10 @@ class DataCenterController extends Controller
              ]);
         }
 
-        return redirect()->back()->with('success', 'Ressource mise à jour avec succès');
+        return redirect()->back()->with('success', 'Ressource mise à jour');
     }
 
-    public function handleDemande(Request $request, $id, $action)
+    public function handleDemande(Request $request, $id, $action) 
     {
         $demande = Demande::findOrFail($id);
 
@@ -147,7 +139,16 @@ class DataCenterController extends Controller
                 'approved_at' => now(),
                 'responsable_id' => Auth::id()
             ]);
-             // Notification logic here...
+            
+             // Notification au demandeur
+             Notification::create([
+                'user_id' => $demande->user_id,
+                'title'   => 'Demande approuvée ✅',
+                'message' => 'Votre demande pour la ressource ' . ($demande->ressource->name ?? '') . ' a été acceptée.',
+                'type'    => 'status_update',
+                'status'  => 'unread'
+            ]);
+
              return redirect()->back()->with('success', 'Demande approuvée.');
 
         } elseif ($action === 'refuse') {
@@ -156,6 +157,16 @@ class DataCenterController extends Controller
                 'refused_at' => now(),
                 'responsable_id' => Auth::id()
             ]);
+
+            // Notification au demandeur
+            Notification::create([
+                'user_id' => $demande->user_id,
+                'title'   => 'Demande refusée ❌',
+                'message' => 'Votre demande a été refusée.',
+                'type'    => 'status_update',
+                'status'  => 'unread'
+            ]);
+
              return redirect()->back()->with('success', 'Demande refusée.');
         }
 
@@ -194,19 +205,11 @@ class DataCenterController extends Controller
 
     public function approuver($id)
     {
-        $demande = Demande::findOrFail($id);
-        $demande->update(['status' => 'approuvee', 'approved_at' => now()]);
-
-        // --- ENVOI DE NOTIFICATION À L'UTILISATEUR ---
-        Notification::create([
-            'user_id' => $demande->user_id, // L'utilisateur qui a fait la demande
-            'title'   => 'Demande approuvée ✅',
-            'message' => 'Votre demande pour la ressource ' . ($demande->ressource->name ?? '') . ' a été acceptée.',
-            'type'    => 'status_update',
-            'status'  => 'unread'
-        ]);
-
-        return redirect()->back()->with('success', 'Demande approuvée et utilisateur notifié !');
+        // Wrapper for handleDemande or specific implementation if needed
+        // For now, redirecting to handleDemande logic or implementing directly
+        // Given handleDemande exists, we might not need this if routes use handleDemande.
+        // But keeping it if routes point here.
+        return $this->handleDemande(request(), $id, 'approve');
     }
 
     public function refuser(Request $request, $id)
@@ -217,7 +220,8 @@ class DataCenterController extends Controller
         $demande->update([
             'status' => 'refusee',
             'raison_refus' => $request->raison_refus,
-            'refused_at' => now()
+            'refused_at' => now(),
+            'responsable_id' => Auth::id()
         ]);
 
         // --- ENVOI DE NOTIFICATION À L'UTILISATEUR ---
@@ -305,6 +309,7 @@ class DataCenterController extends Controller
 
         return back()->with('success', 'Notification traitée.');
     }
+
     public function deleteMessage($id)
     {
         // On cherche le message dans la table 'messages'

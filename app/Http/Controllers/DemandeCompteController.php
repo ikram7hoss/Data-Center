@@ -49,4 +49,47 @@ class DemandeCompteController extends Controller
         // Pour l'instant, on redirige avec un message de succès
         return redirect()->route('demande.create')->with('success', 'Ta demande a bien été envoyée ! Elle sera traitée par un administrateur.');
     }
+
+    public function approve($id)
+    {
+        $demande = \App\Models\CompteDemande::findOrFail($id);
+        
+        // Prevent double approval
+        if ($demande->status === 'approuvee') {
+            return back()->with('error', 'Cette demande a déjà été approuvée.');
+        }
+
+        // Create the User
+        $user = \App\Models\User::create([
+            'name' => $demande->nom_complet,
+            'email' => $demande->email,
+            'password' => $demande->password, // Already hashed in store()
+            'type' => 'utilisateur_interne', // Default type, roles handle specifics
+            'is_active' => true,
+        ]);
+
+        // Assign Role
+        $roleName = $demande->role;
+        // Map friendly names to db role names if necessary, or assume they match
+        // strict mapping based on value in select: ingenieur, enseignant, doctorant
+        $role = \App\Models\Role::where('name', $roleName)->first();
+        if ($role) {
+            $user->roles()->syncWithoutDetaching([$role->id]);
+        }
+
+        // Update Demande Status
+        $demande->update(['status' => 'approuvee']);
+
+        // Notify Admins/User (Optional, could add notification here)
+
+        return back()->with('success', "Compte créé avec succès pour {$user->name}.");
+    }
+
+    public function refuse($id)
+    {
+        $demande = \App\Models\CompteDemande::findOrFail($id);
+        $demande->update(['status' => 'refusee']);
+
+        return back()->with('success', 'Demande refusée.');
+    }
 }

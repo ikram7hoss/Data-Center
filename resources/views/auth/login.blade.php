@@ -236,7 +236,7 @@
             
             <img src="{{ asset('images/logo-datacenter.jpg') }}" alt="Logo" class="logo">
             
-            <h1>Bon retour</h1>
+            <h1>Login</h1>
             <p>Connectez-vous pour accéder au DataCenter</p>
 
             @if ($errors->any())
